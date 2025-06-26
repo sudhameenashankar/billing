@@ -194,16 +194,55 @@ class _MyHomePageState extends State<MyHomePage> {
                           // VERTICAL DIVIDER
                           pw.Container(
                             width: 1.2,
-                            height: 150, // Adjust height as needed
+                            height: 170, // Adjust height as needed
                             color: PdfColors.grey700,
                           ),
-                          // RIGHT BOX: Customer details
+                          // RIGHT BOX: Transport and order details
                           pw.Expanded(
                             child: pw.Column(
                               crossAxisAlignment: pw.CrossAxisAlignment.start,
                               children: [
-                                pw.Text('CUSTOMER NAME : John Doe'),
-                                pw.Text('PHONE : 9876543210'),
+                                pw.Text('Transport Mode:'),
+                                pw.Divider(thickness: 1),
+                                pw.Text('Vehicle No:'),
+                                pw.Divider(thickness: 1),
+                                pw.Text('Document Through:'),
+                                pw.Divider(thickness: 1),
+                                // Purchase Order No and Date in a row
+                                pw.Row(
+                                  children: [
+                                    pw.Expanded(
+                                      child: pw.Text('Purchase Order No:'),
+                                    ),
+                                    pw.Container(
+                                      width: 1,
+                                      height: 14,
+                                      color: PdfColors.grey700,
+                                      margin: const pw.EdgeInsets.symmetric(
+                                        horizontal: 8,
+                                      ),
+                                    ),
+                                    pw.Expanded(child: pw.Text('Date:')),
+                                  ],
+                                ),
+                                pw.Divider(thickness: 1),
+                                pw.Text('GSTIN:'),
+                                pw.Divider(thickness: 1),
+                                // State and State Code in a row
+                                pw.Row(
+                                  children: [
+                                    pw.Expanded(child: pw.Text('State:')),
+                                    pw.Container(
+                                      width: 1,
+                                      height: 14,
+                                      color: PdfColors.grey700,
+                                      margin: const pw.EdgeInsets.symmetric(
+                                        horizontal: 8,
+                                      ),
+                                    ),
+                                    pw.Expanded(child: pw.Text('State Code:')),
+                                  ],
+                                ),
                               ],
                             ),
                           ),
