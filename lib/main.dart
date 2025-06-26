@@ -139,7 +139,7 @@ class _MyHomePageState extends State<MyHomePage> {
     // 2. Calculate taxes
     final sgst = totalAmount * 0.025;
     final cgst = totalAmount * 0.025;
-    final netAmount = totalAmount + sgst + cgst;
+    final netAmount = totalAmount.round() + sgst.round() + cgst.round();
 
     // 3. Convert to words
     final netAmountWords =
@@ -903,11 +903,6 @@ class _MyHomePageState extends State<MyHomePage> {
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
 }
