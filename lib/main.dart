@@ -149,6 +149,62 @@ class _MyHomePageState extends State<MyHomePage> {
                     ],
                   ),
                   pw.Divider(),
+                  pw.Column(
+                    children: [
+                      pw.Row(
+                        crossAxisAlignment: pw.CrossAxisAlignment.start,
+                        children: [
+                          // LEFT BOX: Invoice details
+                          pw.Expanded(
+                            child: pw.Column(
+                              crossAxisAlignment: pw.CrossAxisAlignment.start,
+                              children: [
+                                pw.Text('INVOICE NO : 12345'),
+                                pw.Text('INVOICE DATE : 01/01/2023'),
+                                pw.Divider(thickness: 1),
+                                pw.Row(
+                                  children: [
+                                    pw.Text("State : Tamil Nadu"),
+                                    pw.Container(
+                                      width: 1,
+                                      height: 14,
+                                      color: PdfColors.grey700,
+                                      margin: const pw.EdgeInsets.symmetric(
+                                        horizontal: 8,
+                                      ),
+                                    ),
+                                    pw.Text("State Code : 33"),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                          // VERTICAL DIVIDER
+                          pw.Container(
+                            width: 1.2,
+                            height: 48, // Adjust height as needed
+                            color: PdfColors.grey700,
+                            margin: const pw.EdgeInsets.symmetric(
+                              horizontal: 8,
+                            ),
+                          ),
+                          // RIGHT BOX: Customer details
+                          pw.Expanded(
+                            child: pw.Column(
+                              crossAxisAlignment: pw.CrossAxisAlignment.start,
+                              children: [
+                                pw.Text('CUSTOMER NAME : John Doe'),
+                                pw.Text('PHONE : 9876543210'),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                      pw.Divider(
+                        thickness: 1,
+                      ), // Continuous line under both boxes
+                    ],
+                  ),
                   pw.Row(
                     mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
                     children: [
