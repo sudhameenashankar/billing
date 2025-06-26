@@ -1,3 +1,4 @@
+import 'package:billing/general_utility.dart';
 import 'package:billing/item_model.dart';
 import 'package:flutter/material.dart';
 import 'package:pdf/pdf.dart';
@@ -81,9 +82,23 @@ class _MyHomePageState extends State<MyHomePage> {
     final pdf = pw.Document();
     final selected = items.where((item) => item.checked).toList();
 
+    // 1. Calculate total amount
+    final totalAmount = selected.fold<double>(
+      0,
+      (sum, item) => sum + item.amount,
+    );
+
+    // 2. Calculate taxes
+    final sgst = totalAmount * 0.025;
+    final cgst = totalAmount * 0.025;
+    final netAmount = totalAmount + sgst + cgst;
+
+    // 3. Convert to words
+    final netAmountWords = '${numberToWords(netAmount.round())} Rupees Only';
+
     pdf.addPage(
       pw.Page(
-        margin: pw.EdgeInsets.all(16), // Minimal margin from page edge
+        margin: pw.EdgeInsets.all(16),
         build:
             (pw.Context context) => pw.Container(
               padding: pw.EdgeInsets.all(16), // No extra padding inside
@@ -383,6 +398,13 @@ class _MyHomePageState extends State<MyHomePage> {
                           crossAxisAlignment: pw.CrossAxisAlignment.start,
                           children: [
                             pw.Text('Total Tax Amount (in words)'),
+                            pw.Text(
+                              '${numberToWords((sgst + cgst).round())} Rupees Only',
+                              style: pw.TextStyle(
+                                fontWeight: pw.FontWeight.bold,
+                                fontSize: 10,
+                              ),
+                            ),
                             pw.SizedBox(height: 16),
                             pw.Container(
                               margin: const pw.EdgeInsets.symmetric(
@@ -395,6 +417,13 @@ class _MyHomePageState extends State<MyHomePage> {
                             ),
                             pw.SizedBox(height: 30),
                             pw.Text('Total Invoice Amount (in words)'),
+                            pw.Text(
+                              netAmountWords,
+                              style: pw.TextStyle(
+                                fontWeight: pw.FontWeight.bold,
+                                fontSize: 10,
+                              ),
+                            ),
                             pw.SizedBox(height: 16),
                             pw.Container(
                               margin: const pw.EdgeInsets.symmetric(
@@ -422,27 +451,31 @@ class _MyHomePageState extends State<MyHomePage> {
                         child: pw.Column(
                           crossAxisAlignment: pw.CrossAxisAlignment.start,
                           children: [
-                            pw.Text('Total Amount:'),
+                            pw.Text(
+                              'Total Amount: ${totalAmount.toStringAsFixed(2)}',
+                            ),
                             pw.Divider(
                               thickness: 0.5,
                               color: PdfColors.grey400,
                             ),
-                            pw.Text('Add C GST:'),
+                            pw.Text('Add C GST: ${cgst.toStringAsFixed(2)}'),
                             pw.Divider(
                               thickness: 0.5,
                               color: PdfColors.grey400,
                             ),
-                            pw.Text('Add S GST:'),
+                            pw.Text('Add S GST: ${sgst.toStringAsFixed(2)}'),
                             pw.Divider(
                               thickness: 0.5,
                               color: PdfColors.grey400,
                             ),
-                            pw.Text('Add I GST:'),
+                            pw.Text('Add I GST: 0.00'),
                             pw.Divider(
                               thickness: 0.5,
                               color: PdfColors.grey400,
                             ),
-                            pw.Text('Net Amount:'),
+                            pw.Text(
+                              'Net Amount: ${netAmount.toStringAsFixed(2)}',
+                            ),
                           ],
                         ),
                       ),
@@ -565,7 +598,7 @@ class _MyHomePageState extends State<MyHomePage> {
               int idx = entry.key;
               var item = entry.value;
               return CheckboxListTile(
-                title: Text('${item.nameOfProduct} (₹${item.rate})'),
+                title: Text('${item.nameOfProduct} (${item.rate})'),
                 value: item.checked,
                 onChanged: (val) {
                   setState(() {
