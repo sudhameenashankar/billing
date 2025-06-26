@@ -81,6 +81,8 @@ class _MyHomePageState extends State<MyHomePage> {
   String _customerAddress = '';
   String _customerGstin = '';
 
+  final _formKey = GlobalKey<FormState>();
+
   @override
   void initState() {
     super.initState();
@@ -693,95 +695,67 @@ class _MyHomePageState extends State<MyHomePage> {
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Invoice Number and Date
-                Row(
-                  children: [
-                    Expanded(
-                      child: TextField(
-                        controller: _invoiceNumberController,
-                        decoration: InputDecoration(
-                          labelText: 'Invoice Number',
-                        ),
-                        onChanged: (val) {
-                          setState(() {
-                            _invoiceNumber = val;
-                          });
-                        },
-                      ),
-                    ),
-                    SizedBox(width: 16),
-                    InkWell(
-                      onTap: () async {
-                        DateTime? picked = await showDatePicker(
-                          context: context,
-                          initialDate: _invoiceDate,
-                          firstDate: DateTime(2000),
-                          lastDate: DateTime(2100),
-                        );
-                        if (picked != null) {
-                          setState(() {
-                            _invoiceDate = picked;
-                          });
-                        }
-                      },
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                          vertical: 12.0,
-                          horizontal: 8,
-                        ),
-                        child: Row(
-                          children: [
-                            Icon(Icons.calendar_today, size: 18),
-                            SizedBox(width: 8),
-                            Text(
-                              "${_invoiceDate.day.toString().padLeft(2, '0')}/"
-                              "${_invoiceDate.month.toString().padLeft(2, '0')}/"
-                              "${_invoiceDate.year}",
-                              style: TextStyle(fontSize: 16),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                SizedBox(height: 16),
-                // Customer Details
-                TextField(
-                  controller: _customerNameController,
-                  decoration: InputDecoration(labelText: 'Name'),
-                  onChanged: (val) {
-                    setState(() {
-                      _customerName = val;
-                    });
-                  },
-                ),
-                SizedBox(height: 8),
-                TextField(
-                  controller: _customerAddressController,
-                  decoration: InputDecoration(labelText: 'Address'),
-                  onChanged: (val) {
-                    setState(() {
-                      _customerAddress = val;
-                    });
-                  },
-                ),
-                SizedBox(height: 8),
-                TextField(
-                  controller: _customerGstinController,
-                  decoration: InputDecoration(labelText: 'GSTIN'),
-                  onChanged: (val) {
-                    setState(() {
-                      _customerGstin = val;
-                    });
-                  },
-                ),
-                SizedBox(height: 16),
-                // ...now your items list and the rest...
-              ],
+            Form(
+              key: _formKey,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Invoice Number
+                  TextFormField(
+                    controller: _invoiceNumberController,
+                    decoration: InputDecoration(labelText: 'Invoice Number'),
+                    validator:
+                        (val) =>
+                            val == null || val.trim().isEmpty
+                                ? 'Enter Invoice Number'
+                                : null,
+                    onChanged: (val) => setState(() => _invoiceNumber = val),
+                  ),
+                  SizedBox(height: 16),
+                  // Name
+                  TextFormField(
+                    controller: _customerNameController,
+                    decoration: InputDecoration(labelText: 'Name'),
+                    validator:
+                        (val) =>
+                            val == null || val.trim().isEmpty
+                                ? 'Enter Name'
+                                : null,
+                    onChanged: (val) => setState(() => _customerName = val),
+                  ),
+                  SizedBox(height: 8),
+                  // Address
+                  TextFormField(
+                    controller: _customerAddressController,
+                    decoration: InputDecoration(labelText: 'Address'),
+                    validator:
+                        (val) =>
+                            val == null || val.trim().isEmpty
+                                ? 'Enter Address'
+                                : null,
+                    onChanged: (val) => setState(() => _customerAddress = val),
+                  ),
+                  SizedBox(height: 8),
+                  // GSTIN
+                  TextFormField(
+                    controller: _customerGstinController,
+                    decoration: InputDecoration(labelText: 'GSTIN'),
+                    validator: (val) {
+                      if (val == null || val.trim().isEmpty)
+                        return 'Enter GSTIN';
+                      final gstinRegex = RegExp(
+                        r'^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$',
+                      );
+                      if (!gstinRegex.hasMatch(val.trim()))
+                        return 'Enter valid GSTIN';
+                      return null;
+                    },
+                    onChanged: (val) => setState(() => _customerGstin = val),
+                  ),
+                  SizedBox(height: 16),
+                  // ...rest of your widgets...
+                ],
+              ),
             ),
             const SizedBox(height: 20),
             const Text(
@@ -844,7 +818,11 @@ class _MyHomePageState extends State<MyHomePage> {
             }),
             const SizedBox(height: 20),
             ElevatedButton(
-              onPressed: _generatePdf,
+              onPressed: () {
+                if (_formKey.currentState!.validate()) {
+                  _generatePdf();
+                }
+              },
               child: const Text('Generate PDF'),
             ),
             const SizedBox(height: 20),
