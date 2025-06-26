@@ -1,3 +1,4 @@
+import 'package:billing/item_model.dart';
 import 'package:flutter/material.dart';
 import 'package:pdf/pdf.dart';
 import 'package:printing/printing.dart';
@@ -59,10 +60,10 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
 
-  List<Map<String, dynamic>> items = [
-    {"name": "Item 1", "price": 100, "checked": false},
-    {"name": "Item 2", "price": 200, "checked": false},
-    {"name": "Item 3", "price": 300, "checked": false},
+  List<InvoiceItem> items = [
+    InvoiceItem(nameOfProduct: "Item 1", qty: 2, rate: 100),
+    InvoiceItem(nameOfProduct: "Item 2", qty: 1, rate: 200),
+    InvoiceItem(nameOfProduct: "Item 3", qty: 3, rate: 300),
   ];
 
   void _incrementCounter() {
@@ -78,7 +79,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Future<void> _generatePdf() async {
     final pdf = pw.Document();
-    final selected = items.where((item) => item['checked']).toList();
+    final selected = items.where((item) => item.checked).toList();
 
     pdf.addPage(
       pw.Page(
@@ -341,33 +342,27 @@ class _MyHomePageState extends State<MyHomePage> {
                                   ),
                                   pw.Padding(
                                     padding: const pw.EdgeInsets.all(4),
-                                    child: pw.Text(item["name"] ?? ''),
+                                    child: pw.Text(item.nameOfProduct),
                                   ),
                                   pw.Padding(
                                     padding: const pw.EdgeInsets.all(4),
                                     child: pw.Text(
-                                      item["hsn"] ?? '',
+                                      item.hsnOrAcs.toString(),
                                     ), // Add HSN/ACS to your items if needed
                                   ),
                                   pw.Padding(
                                     padding: const pw.EdgeInsets.all(4),
                                     child: pw.Text(
-                                      item["qty"]?.toString() ?? '1',
+                                      item.qty.toString(),
                                     ), // Add qty to your items if needed
                                   ),
                                   pw.Padding(
                                     padding: const pw.EdgeInsets.all(4),
-                                    child: pw.Text(
-                                      item["rate"]?.toString() ??
-                                          (item["price"]?.toString() ?? ''),
-                                    ),
+                                    child: pw.Text(item.rate.toString()),
                                   ),
                                   pw.Padding(
                                     padding: const pw.EdgeInsets.all(4),
-                                    child: pw.Text(
-                                      item["amount"]?.toString() ??
-                                          (item["price"]?.toString() ?? ''),
-                                    ),
+                                    child: pw.Text(item.amount.toString()),
                                   ),
                                 ],
                               );
@@ -570,11 +565,11 @@ class _MyHomePageState extends State<MyHomePage> {
               int idx = entry.key;
               var item = entry.value;
               return CheckboxListTile(
-                title: Text('${item["name"]} (₹${item["price"]})'),
-                value: item["checked"],
+                title: Text('${item.nameOfProduct} (₹${item.rate})'),
+                value: item.checked,
                 onChanged: (val) {
                   setState(() {
-                    items[idx]["checked"] = val!;
+                    item.checked = val!;
                   });
                 },
               );
