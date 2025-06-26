@@ -129,7 +129,11 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Future<void> _generatePdf() async {
     final pdf = pw.Document();
-    final selected = items.where((item) => item.checked).toList();
+    // Only include checked items with qty > 0 and rate > 0
+    final selected =
+        items
+            .where((item) => item.checked && item.qty > 0 && item.rate > 0)
+            .toList();
 
     // 1. Calculate total amount
     final totalAmount = selected.fold<double>(
