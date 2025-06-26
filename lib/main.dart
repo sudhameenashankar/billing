@@ -82,96 +82,106 @@ class _MyHomePageState extends State<MyHomePage> {
 
     pdf.addPage(
       pw.Page(
+        margin: pw.EdgeInsets.all(16), // Minimal margin from page edge
         build:
-            (pw.Context context) => pw.Column(
-              crossAxisAlignment: pw.CrossAxisAlignment.center,
-              children: [
-                pw.Row(
-                  mainAxisAlignment: pw.MainAxisAlignment.center,
-                  children: [
-                    pw.Expanded(
-                      child: pw.Text(
-                        'GST IN : 33BKIPR1631K1Z3',
-                        style: pw.TextStyle(fontSize: 10),
-                        textAlign: pw.TextAlign.left,
-                      ),
-                    ),
-                    pw.Container(
-                      padding: const pw.EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 6,
-                      ),
-                      decoration: pw.BoxDecoration(
-                        border: pw.Border.all(color: PdfColors.black, width: 2),
-                        color: PdfColors.grey200,
-                        borderRadius: pw.BorderRadius.circular(4),
-                      ),
-                      child: pw.Text(
-                        'TAX INVOICE',
-                        style: pw.TextStyle(
-                          fontSize: 12,
-                          fontWeight: pw.FontWeight.bold,
+            (pw.Context context) => pw.Container(
+              padding: pw.EdgeInsets.all(16), // No extra padding inside
+              decoration: pw.BoxDecoration(
+                border: pw.Border.all(color: PdfColors.black, width: 0.5),
+              ),
+              child: pw.Column(
+                crossAxisAlignment: pw.CrossAxisAlignment.center,
+                children: [
+                  pw.Row(
+                    mainAxisAlignment: pw.MainAxisAlignment.center,
+                    children: [
+                      pw.Expanded(
+                        child: pw.Text(
+                          'GST IN : 33BKIPR1631K1Z3',
+                          style: pw.TextStyle(fontSize: 10),
+                          textAlign: pw.TextAlign.left,
                         ),
                       ),
-                    ),
-                    pw.Expanded(
-                      child: pw.Text(
-                        'CELL NO : 9344703477',
-                        style: pw.TextStyle(fontSize: 10),
-                        textAlign: pw.TextAlign.right,
+                      pw.Container(
+                        padding: const pw.EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 6,
+                        ),
+                        decoration: pw.BoxDecoration(
+                          border: pw.Border.all(
+                            color: PdfColors.black,
+                            width: 2,
+                          ),
+                          color: PdfColors.grey200,
+                          borderRadius: pw.BorderRadius.circular(4),
+                        ),
+                        child: pw.Text(
+                          'TAX INVOICE',
+                          style: pw.TextStyle(
+                            fontSize: 12,
+                            fontWeight: pw.FontWeight.bold,
+                          ),
+                        ),
                       ),
-                    ),
-                  ],
-                ),
-                pw.SizedBox(height: 20),
-                pw.Column(
-                  mainAxisAlignment: pw.MainAxisAlignment.center,
-                  crossAxisAlignment: pw.CrossAxisAlignment.center,
-                  children: [
-                    pw.Text(
-                      'RAMASAMY TEX,',
-                      style: pw.TextStyle(
-                        fontWeight: pw.FontWeight.bold,
-                        fontSize: 20,
+                      pw.Expanded(
+                        child: pw.Text(
+                          'CELL NO : 9344703477',
+                          style: pw.TextStyle(fontSize: 10),
+                          textAlign: pw.TextAlign.right,
+                        ),
                       ),
-                    ),
-                    pw.Text('39-A, RAJAGOUNDAMPALAYAM, STREET NO.6'),
-                    pw.Text('TIRUCHENGODE - 637209, NAMAKKAL DT'),
-                  ],
-                ),
-                pw.Divider(),
-                pw.Row(
-                  mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-                  children: [
-                    pw.Text(
-                      'Item',
-                      style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
-                    ),
-                    pw.Text(
-                      'Price',
-                      style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
-                    ),
-                  ],
-                ),
-                pw.Divider(),
-                ...selected.map(
-                  (item) => pw.Row(
-                    mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-                    children: [
-                      pw.Text(item["name"]),
-                      pw.Text('${item["price"]}'),
                     ],
                   ),
-                ),
-                pw.Divider(),
-                pw.Align(
-                  alignment: pw.Alignment.centerRight,
-                  child: pw.Text(
-                    'Total: ${selected.fold<int>(0, (sum, item) => sum + (item["price"] as int))}',
-                    style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
+                  pw.SizedBox(height: 20),
+                  pw.Column(
+                    mainAxisAlignment: pw.MainAxisAlignment.center,
+                    crossAxisAlignment: pw.CrossAxisAlignment.center,
+                    children: [
+                      pw.Text(
+                        'RAMASAMY TEX,',
+                        style: pw.TextStyle(
+                          fontWeight: pw.FontWeight.bold,
+                          fontSize: 20,
+                        ),
+                      ),
+                      pw.Text('39-A, RAJAGOUNDAMPALAYAM, STREET NO.6'),
+                      pw.Text('TIRUCHENGODE - 637209, NAMAKKAL DT'),
+                    ],
                   ),
-                ),
-              ],
+                  pw.Divider(),
+                  pw.Row(
+                    mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                    children: [
+                      pw.Text(
+                        'Item',
+                        style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
+                      ),
+                      pw.Text(
+                        'Price',
+                        style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
+                      ),
+                    ],
+                  ),
+                  pw.Divider(),
+                  ...selected.map(
+                    (item) => pw.Row(
+                      mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                      children: [
+                        pw.Text(item["name"]),
+                        pw.Text('${item["price"]}'),
+                      ],
+                    ),
+                  ),
+                  pw.Divider(),
+                  pw.Align(
+                    alignment: pw.Alignment.centerRight,
+                    child: pw.Text(
+                      'Total: ${selected.fold<int>(0, (sum, item) => sum + (item["price"] as int))}',
+                      style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
+                    ),
+                  ),
+                ],
+              ),
             ),
       ),
     );
