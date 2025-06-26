@@ -1,5 +1,6 @@
 import 'package:billing/general_utility.dart';
 import 'package:billing/item_model.dart';
+import 'package:billing/services';
 import 'package:flutter/material.dart';
 import 'package:pdf/pdf.dart';
 import 'package:printing/printing.dart';
@@ -44,15 +45,6 @@ class MyApp extends StatelessWidget {
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key, required this.title});
-
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
 
   final String title;
 
@@ -114,17 +106,6 @@ class _MyHomePageState extends State<MyHomePage> {
     // Save only the names
     final names = items.map((e) => e.nameOfProduct).toList();
     await prefs.setStringList('invoice_item_names', names);
-  }
-
-  void _incrementCounter() {
-    setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
-    });
   }
 
   Future<void> _generatePdf() async {
@@ -713,20 +694,9 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
     return Scaffold(
       appBar: AppBar(
-        // TRY THIS: Try changing the color here to a specific color (to
-        // Colors.amber, perhaps?) and trigger a hot reload to see the AppBar
-        // change color while the other colors stay the same.
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
         title: Text(widget.title),
       ),
       body: SafeArea(
@@ -744,6 +714,8 @@ class _MyHomePageState extends State<MyHomePage> {
                       // Invoice Number
                       TextFormField(
                         controller: _invoiceNumberController,
+                        textCapitalization: TextCapitalization.characters,
+                        inputFormatters: [UpperCaseTextFormatter()],
                         decoration: InputDecoration(
                           labelText: 'Invoice Number',
                         ),
@@ -760,6 +732,8 @@ class _MyHomePageState extends State<MyHomePage> {
                       TextFormField(
                         controller: _customerNameController,
                         decoration: InputDecoration(labelText: 'Name'),
+                        textCapitalization: TextCapitalization.characters,
+                        inputFormatters: [UpperCaseTextFormatter()],
                         validator:
                             (val) =>
                                 val == null || val.trim().isEmpty
@@ -772,6 +746,8 @@ class _MyHomePageState extends State<MyHomePage> {
                       TextFormField(
                         controller: _customerAddressController,
                         decoration: InputDecoration(labelText: 'Address'),
+                        textCapitalization: TextCapitalization.characters,
+                        inputFormatters: [UpperCaseTextFormatter()],
                         validator:
                             (val) =>
                                 val == null || val.trim().isEmpty
@@ -785,6 +761,8 @@ class _MyHomePageState extends State<MyHomePage> {
                       TextFormField(
                         controller: _customerGstinController,
                         decoration: InputDecoration(labelText: 'GSTIN'),
+                        textCapitalization: TextCapitalization.characters,
+                        inputFormatters: [UpperCaseTextFormatter()],
                         validator: (val) {
                           if (val == null || val.trim().isEmpty) {
                             return 'Enter GSTIN';
@@ -826,12 +804,13 @@ class _MyHomePageState extends State<MyHomePage> {
                       Expanded(child: Text(item.nameOfProduct)),
                       SizedBox(
                         width: 60,
-                        child: TextField(
+                        child: TextFormField(
+                          initialValue:
+                              item.qty == 0 ? '' : item.qty.toString(),
+                          textCapitalization: TextCapitalization.characters,
+                          inputFormatters: [UpperCaseTextFormatter()],
                           decoration: const InputDecoration(labelText: 'Qty'),
                           keyboardType: TextInputType.number,
-                          controller: TextEditingController(
-                            text: item.qty.toString(),
-                          ),
                           onChanged: (val) {
                             setState(() {
                               item.qty = int.tryParse(val) ?? 0;
@@ -843,12 +822,11 @@ class _MyHomePageState extends State<MyHomePage> {
                       SizedBox(width: 8),
                       SizedBox(
                         width: 80,
-                        child: TextField(
+                        child: TextFormField(
+                          initialValue:
+                              item.rate == 0 ? '' : item.rate.toString(),
                           decoration: const InputDecoration(labelText: 'Rate'),
                           keyboardType: TextInputType.number,
-                          controller: TextEditingController(
-                            text: item.rate.toString(),
-                          ),
                           onChanged: (val) {
                             setState(() {
                               item.rate = double.tryParse(val) ?? 0;
