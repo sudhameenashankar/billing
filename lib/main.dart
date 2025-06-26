@@ -69,6 +69,18 @@ class _MyHomePageState extends State<MyHomePage> {
   final _qtyController = TextEditingController();
   final _rateController = TextEditingController();
 
+  String _invoiceNumber = '';
+  DateTime _invoiceDate = DateTime.now();
+  final _invoiceNumberController = TextEditingController();
+
+  final _customerNameController = TextEditingController();
+  final _customerAddressController = TextEditingController();
+  final _customerGstinController = TextEditingController();
+
+  String _customerName = '';
+  String _customerAddress = '';
+  String _customerGstin = '';
+
   @override
   void initState() {
     super.initState();
@@ -210,8 +222,13 @@ class _MyHomePageState extends State<MyHomePage> {
                             child: pw.Column(
                               crossAxisAlignment: pw.CrossAxisAlignment.start,
                               children: [
-                                pw.Text('INVOICE NO : 12345'),
-                                pw.Text('INVOICE DATE : 01/01/2023'),
+                                pw.Text('INVOICE NO : $_invoiceNumber'),
+                                pw.Text(
+                                  'INVOICE DATE : '
+                                  '${_invoiceDate.day.toString().padLeft(2, '0')}/'
+                                  '${_invoiceDate.month.toString().padLeft(2, '0')}/'
+                                  '${_invoiceDate.year}',
+                                ),
                                 pw.Divider(thickness: 1),
                                 pw.Row(
                                   children: [
@@ -234,11 +251,9 @@ class _MyHomePageState extends State<MyHomePage> {
                                     fontWeight: pw.FontWeight.bold,
                                   ),
                                 ),
-                                pw.Container(
-                                  width: double.infinity,
-                                  height: 70, // Adjust height as needed
-                                  // child: pw.Text(''), // Leave empty for now, fill later
-                                ),
+                                pw.Text(_customerName),
+                                pw.Text(_customerAddress),
+                                pw.Text(_customerGstin),
                               ],
                             ),
                           ),
@@ -263,7 +278,9 @@ class _MyHomePageState extends State<MyHomePage> {
                                 pw.Row(
                                   children: [
                                     pw.Expanded(
-                                      child: pw.Text('Purchase Order No:'),
+                                      child: pw.Text(
+                                        'Purchase Order No: $_invoiceNumber',
+                                      ),
                                     ),
                                     pw.Container(
                                       width: 1,
@@ -273,11 +290,18 @@ class _MyHomePageState extends State<MyHomePage> {
                                         horizontal: 8,
                                       ),
                                     ),
-                                    pw.Expanded(child: pw.Text('Date:')),
+                                    pw.Expanded(
+                                      child: pw.Text(
+                                        'Date: '
+                                        '${_invoiceDate.day.toString().padLeft(2, '0')}/'
+                                        '${_invoiceDate.month.toString().padLeft(2, '0')}/'
+                                        '${_invoiceDate.year}',
+                                      ),
+                                    ),
                                   ],
                                 ),
                                 pw.Divider(thickness: 1),
-                                pw.Text('GSTIN:'),
+                                pw.Text('GSTIN: $_customerGstin'),
                                 pw.Divider(thickness: 1),
                                 // State and State Code in a row
                                 pw.Row(
@@ -669,6 +693,97 @@ class _MyHomePageState extends State<MyHomePage> {
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Invoice Number and Date
+                Row(
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        controller: _invoiceNumberController,
+                        decoration: InputDecoration(
+                          labelText: 'Invoice Number',
+                        ),
+                        onChanged: (val) {
+                          setState(() {
+                            _invoiceNumber = val;
+                          });
+                        },
+                      ),
+                    ),
+                    SizedBox(width: 16),
+                    InkWell(
+                      onTap: () async {
+                        DateTime? picked = await showDatePicker(
+                          context: context,
+                          initialDate: _invoiceDate,
+                          firstDate: DateTime(2000),
+                          lastDate: DateTime(2100),
+                        );
+                        if (picked != null) {
+                          setState(() {
+                            _invoiceDate = picked;
+                          });
+                        }
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                          vertical: 12.0,
+                          horizontal: 8,
+                        ),
+                        child: Row(
+                          children: [
+                            Icon(Icons.calendar_today, size: 18),
+                            SizedBox(width: 8),
+                            Text(
+                              "${_invoiceDate.day.toString().padLeft(2, '0')}/"
+                              "${_invoiceDate.month.toString().padLeft(2, '0')}/"
+                              "${_invoiceDate.year}",
+                              style: TextStyle(fontSize: 16),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 16),
+                // Customer Details
+                TextField(
+                  controller: _customerNameController,
+                  decoration: InputDecoration(labelText: 'Name'),
+                  onChanged: (val) {
+                    setState(() {
+                      _customerName = val;
+                    });
+                  },
+                ),
+                SizedBox(height: 8),
+                TextField(
+                  controller: _customerAddressController,
+                  decoration: InputDecoration(labelText: 'Address'),
+                  onChanged: (val) {
+                    setState(() {
+                      _customerAddress = val;
+                    });
+                  },
+                ),
+                SizedBox(height: 8),
+                TextField(
+                  controller: _customerGstinController,
+                  decoration: InputDecoration(labelText: 'GSTIN'),
+                  onChanged: (val) {
+                    setState(() {
+                      _customerGstin = val;
+                    });
+                  },
+                ),
+                SizedBox(height: 16),
+                // ...now your items list and the rest...
+              ],
+            ),
+            const SizedBox(height: 20),
             const Text(
               'Select items for billing:',
               style: TextStyle(fontSize: 18),
