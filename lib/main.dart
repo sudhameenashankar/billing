@@ -379,35 +379,51 @@ class _MyHomePageState extends State<MyHomePage> {
                     ],
                   ),
                   pw.Row(
-                    mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: pw.CrossAxisAlignment.start,
                     children: [
-                      pw.Text(
-                        'Item',
-                        style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
+                      // LEFT BOX (60%)
+                      pw.Expanded(
+                        flex: 3,
+                        child: pw.Column(
+                          crossAxisAlignment: pw.CrossAxisAlignment.start,
+                          children: [
+                            // Total Tax Amount (in words)
+                            pw.Text('Total Tax Amount (in words)'),
+                            pw.SizedBox(height: 8),
+                            pw.Container(
+                              margin: const pw.EdgeInsets.symmetric(
+                                vertical: 2,
+                              ),
+                              child: pw.Divider(
+                                thickness: 1,
+                                color: PdfColors.grey700,
+                              ),
+                            ),
+                            pw.SizedBox(height: 8),
+                            // Total Invoice Amount (in words)
+                            pw.Text('Total Invoice Amount (in words)'),
+                            pw.SizedBox(height: 8),
+                            pw.Container(
+                              margin: const pw.EdgeInsets.symmetric(
+                                vertical: 2,
+                              ),
+                              child: pw.Divider(
+                                thickness: 1,
+                                color: PdfColors.grey700,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
-                      pw.Text(
-                        'Price',
-                        style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
+                      pw.SizedBox(width: 8),
+                      // RIGHT BOX (40%)
+                      pw.Expanded(
+                        flex: 2,
+                        child: pw.Container(
+                          // Add your right box content here
+                        ),
                       ),
                     ],
-                  ),
-                  pw.Divider(),
-                  ...selected.map(
-                    (item) => pw.Row(
-                      mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-                      children: [
-                        pw.Text(item["name"]),
-                        pw.Text('${item["price"]}'),
-                      ],
-                    ),
-                  ),
-                  pw.Divider(),
-                  pw.Align(
-                    alignment: pw.Alignment.centerRight,
-                    child: pw.Text(
-                      'Total: ${selected.fold<int>(0, (sum, item) => sum + (item["price"] as int))}',
-                      style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
-                    ),
                   ),
                 ],
               ),
