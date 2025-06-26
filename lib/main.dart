@@ -383,11 +383,10 @@ class _MyHomePageState extends State<MyHomePage> {
                     children: [
                       // LEFT BOX (60%)
                       pw.Expanded(
-                        flex: 3, // 60%
+                        flex: 3,
                         child: pw.Column(
                           crossAxisAlignment: pw.CrossAxisAlignment.start,
                           children: [
-                            // Total Tax Amount (in words)
                             pw.Text('Total Tax Amount (in words)'),
                             pw.SizedBox(height: 16),
                             pw.Container(
@@ -399,8 +398,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                 color: PdfColors.grey700,
                               ),
                             ),
-                            pw.SizedBox(height: 45),
-                            // Total Invoice Amount (in words)
+                            pw.SizedBox(height: 30),
                             pw.Text('Total Invoice Amount (in words)'),
                             pw.SizedBox(height: 16),
                             pw.Container(
@@ -415,10 +413,17 @@ class _MyHomePageState extends State<MyHomePage> {
                           ],
                         ),
                       ),
-                      pw.SizedBox(width: 8),
+                      // VERTICAL DIVIDER
+                      pw.Container(
+                        width: 1,
+                        height:
+                            140, // Adjust height as needed to match the tallest box
+                        color: PdfColors.grey400,
+                        margin: const pw.EdgeInsets.symmetric(horizontal: 8),
+                      ),
                       // RIGHT BOX (40%)
                       pw.Expanded(
-                        flex: 2, // 40%
+                        flex: 2,
                         child: pw.Column(
                           crossAxisAlignment: pw.CrossAxisAlignment.start,
                           children: [
