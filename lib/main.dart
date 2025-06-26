@@ -416,10 +416,10 @@ class _MyHomePageState extends State<MyHomePage> {
                       // VERTICAL DIVIDER
                       pw.Container(
                         width: 1,
+                        margin: const pw.EdgeInsets.symmetric(horizontal: 8),
                         height:
                             140, // Adjust height as needed to match the tallest box
-                        color: PdfColors.grey400,
-                        margin: const pw.EdgeInsets.symmetric(horizontal: 8),
+                        color: PdfColors.black,
                       ),
                       // RIGHT BOX (40%)
                       pw.Expanded(
@@ -448,10 +448,6 @@ class _MyHomePageState extends State<MyHomePage> {
                               color: PdfColors.grey400,
                             ),
                             pw.Text('Net Amount:'),
-                            pw.Divider(
-                              thickness: 0.5,
-                              color: PdfColors.grey400,
-                            ),
                           ],
                         ),
                       ),
