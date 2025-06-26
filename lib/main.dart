@@ -454,6 +454,79 @@ class _MyHomePageState extends State<MyHomePage> {
                     ],
                   ),
                   pw.Divider(thickness: 1),
+                  pw.Container(
+                    decoration: pw.BoxDecoration(
+                      border: pw.Border.all(color: PdfColors.black, width: 1),
+                      borderRadius: pw.BorderRadius.circular(4),
+                    ),
+                    padding: const pw.EdgeInsets.all(8),
+                    margin: const pw.EdgeInsets.only(
+                      top: 12,
+                    ), // Optional: space above the box
+                    height: 80, // Adjust height as needed
+                    child: pw.Row(
+                      crossAxisAlignment: pw.CrossAxisAlignment.stretch,
+                      children: [
+                        // LEFT BOX: Bank Details
+                        pw.Expanded(
+                          flex: 1,
+                          child: pw.Container(
+                            alignment: pw.Alignment.topLeft,
+                            child: pw.Column(
+                              crossAxisAlignment: pw.CrossAxisAlignment.start,
+                              mainAxisAlignment: pw.MainAxisAlignment.start,
+                              children: [
+                                pw.Text(
+                                  'BANK DETAILS :',
+                                  style: pw.TextStyle(
+                                    fontWeight: pw.FontWeight.bold,
+                                  ),
+                                ),
+                                pw.Text('Bank Name : TMB, Tiruchengode Branch'),
+                                pw.Text('Ac No: 126150050801310'),
+                                pw.Text('IFSC No : TMBL0000126'),
+                              ],
+                            ),
+                          ),
+                        ),
+                        // VERTICAL DIVIDER with margin
+                        pw.Container(
+                          width: 1,
+                          margin: const pw.EdgeInsets.symmetric(horizontal: 12),
+                          color: PdfColors.black,
+                        ),
+                        // RIGHT BOX: Certificate & Signature
+                        pw.Expanded(
+                          flex: 1,
+                          child: pw.Container(
+                            alignment: pw.Alignment.topLeft,
+                            child: pw.Column(
+                              crossAxisAlignment: pw.CrossAxisAlignment.start,
+                              mainAxisAlignment: pw.MainAxisAlignment.start,
+                              children: [
+                                pw.Text(
+                                  'Certificate that the particulars given above are true and correct',
+                                  style: pw.TextStyle(fontSize: 10),
+                                ),
+                                pw.SizedBox(height: 12),
+                                pw.Text(
+                                  'For RAMASAMY TEX,',
+                                  style: pw.TextStyle(
+                                    fontWeight: pw.FontWeight.bold,
+                                  ),
+                                ),
+                                pw.SizedBox(height: 18),
+                                pw.Text(
+                                  'Authorised Signatory',
+                                  style: pw.TextStyle(fontSize: 10),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                 ],
               ),
             ),
