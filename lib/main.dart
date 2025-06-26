@@ -1,9 +1,11 @@
+import 'dart:convert';
 import 'package:billing/general_utility.dart';
 import 'package:billing/item_model.dart';
 import 'package:flutter/material.dart';
 import 'package:pdf/pdf.dart';
 import 'package:printing/printing.dart';
 import 'package:pdf/widgets.dart' as pw;
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
   runApp(const MyApp());
@@ -61,11 +63,44 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
 
-  List<InvoiceItem> items = [
-    InvoiceItem(nameOfProduct: "Item 1", qty: 2, rate: 100),
-    InvoiceItem(nameOfProduct: "Item 2", qty: 1, rate: 200),
-    InvoiceItem(nameOfProduct: "Item 3", qty: 3, rate: 300),
-  ];
+  List<InvoiceItem> items = [];
+
+  final _nameController = TextEditingController();
+  final _qtyController = TextEditingController();
+  final _rateController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    _loadItems();
+  }
+
+  Future<void> _loadItems() async {
+    final prefs = await SharedPreferences.getInstance();
+    final names = prefs.getStringList('invoice_item_names');
+    if (names != null) {
+      setState(() {
+        items =
+            names
+                .map(
+                  (name) => InvoiceItem(
+                    nameOfProduct: name,
+                    qty: 0,
+                    rate: 0,
+                    checked: false,
+                  ),
+                )
+                .toList();
+      });
+    }
+  }
+
+  Future<void> _saveItems() async {
+    final prefs = await SharedPreferences.getInstance();
+    // Save only the names
+    final names = items.map((e) => e.nameOfProduct).toList();
+    await prefs.setStringList('invoice_item_names', names);
+  }
 
   void _incrementCounter() {
     setState(() {
@@ -113,7 +148,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     children: [
                       pw.Expanded(
                         child: pw.Text(
-                          'GST IN : 33BKIPR1631K1Z3',
+                          'GST IN : 33BKIPR1631K2Z2',
                           style: pw.TextStyle(fontSize: 10),
                           textAlign: pw.TextAlign.left,
                         ),
@@ -535,7 +570,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                 pw.SizedBox(height: 8),
                                 pw.Text('Bank Name : TMB, Tiruchengode Branch'),
                                 pw.SizedBox(height: 8),
-                                pw.Text('Ac No: 126150050801310'),
+                                pw.Text('Ac No: 126150050801535'),
                                 pw.SizedBox(height: 8),
                                 pw.Text('IFSC No : TMBL0000126'),
                               ],
@@ -591,6 +626,27 @@ class _MyHomePageState extends State<MyHomePage> {
     await Printing.layoutPdf(onLayout: (format) => pdf.save());
   }
 
+  void _deleteItem(int index) {
+    setState(() {
+      items.removeAt(index);
+    });
+    _saveItems();
+  }
+
+  void _addNewItem(String name, int qty, double rate) {
+    setState(() {
+      items.add(
+        InvoiceItem(
+          nameOfProduct: name,
+          qty: qty,
+          rate: rate,
+          checked: false, // Default to unchecked
+        ),
+      );
+    });
+    _saveItems();
+  }
+
   @override
   Widget build(BuildContext context) {
     // This method is rerun every time setState is called, for instance as done
@@ -622,6 +678,14 @@ class _MyHomePageState extends State<MyHomePage> {
               var item = entry.value;
               return Row(
                 children: [
+                  Checkbox(
+                    value: item.checked,
+                    onChanged: (val) {
+                      setState(() {
+                        item.checked = val!;
+                      });
+                    },
+                  ),
                   Expanded(child: Text(item.nameOfProduct)),
                   SizedBox(
                     width: 60,
@@ -635,6 +699,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         setState(() {
                           item.qty = int.tryParse(val) ?? 0;
                         });
+                        _saveItems();
                       },
                     ),
                   ),
@@ -651,16 +716,13 @@ class _MyHomePageState extends State<MyHomePage> {
                         setState(() {
                           item.rate = double.tryParse(val) ?? 0;
                         });
+                        _saveItems();
                       },
                     ),
                   ),
-                  Checkbox(
-                    value: item.checked,
-                    onChanged: (val) {
-                      setState(() {
-                        item.checked = val!;
-                      });
-                    },
+                  IconButton(
+                    icon: Icon(Icons.delete),
+                    onPressed: () => _deleteItem(idx),
                   ),
                 ],
               );
@@ -669,6 +731,48 @@ class _MyHomePageState extends State<MyHomePage> {
             ElevatedButton(
               onPressed: _generatePdf,
               child: const Text('Generate PDF'),
+            ),
+            const SizedBox(height: 20),
+            const Text('Add new item:', style: TextStyle(fontSize: 18)),
+            Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    controller: _nameController,
+                    decoration: InputDecoration(labelText: 'Name'),
+                  ),
+                ),
+                SizedBox(
+                  width: 60,
+                  child: TextField(
+                    controller: _qtyController,
+                    decoration: InputDecoration(labelText: 'Qty'),
+                    keyboardType: TextInputType.number,
+                  ),
+                ),
+                SizedBox(
+                  width: 80,
+                  child: TextField(
+                    controller: _rateController,
+                    decoration: InputDecoration(labelText: 'Rate'),
+                    keyboardType: TextInputType.number,
+                  ),
+                ),
+                IconButton(
+                  icon: Icon(Icons.add),
+                  onPressed: () {
+                    final name = _nameController.text;
+                    final qty = int.tryParse(_qtyController.text) ?? 0;
+                    final rate = double.tryParse(_rateController.text) ?? 0;
+                    if (name.isNotEmpty && qty > 0 && rate > 0) {
+                      _addNewItem(name, qty, rate);
+                      _nameController.clear();
+                      _qtyController.clear();
+                      _rateController.clear();
+                    }
+                  },
+                ),
+              ],
             ),
           ],
         ),

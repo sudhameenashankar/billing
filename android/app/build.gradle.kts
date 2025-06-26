@@ -8,7 +8,7 @@ plugins {
 android {
     namespace = "com.example.billing"
     compileSdk = flutter.compileSdkVersion
-    ndkVersion = 31
+    ndkVersion = flutter.ndkVersion
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
