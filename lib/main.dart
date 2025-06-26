@@ -725,201 +725,218 @@ class _MyHomePageState extends State<MyHomePage> {
         // the App.build method, and use it to set our appbar title.
         title: Text(widget.title),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            Form(
-              key: _formKey,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Invoice Number
-                  TextFormField(
-                    controller: _invoiceNumberController,
-                    decoration: InputDecoration(labelText: 'Invoice Number'),
-                    validator:
-                        (val) =>
-                            val == null || val.trim().isEmpty
-                                ? 'Enter Invoice Number'
-                                : null,
-                    onChanged: (val) => setState(() => _invoiceNumber = val),
-                  ),
-                  SizedBox(height: 16),
-                  // Name
-                  TextFormField(
-                    controller: _customerNameController,
-                    decoration: InputDecoration(labelText: 'Name'),
-                    validator:
-                        (val) =>
-                            val == null || val.trim().isEmpty
-                                ? 'Enter Name'
-                                : null,
-                    onChanged: (val) => setState(() => _customerName = val),
-                  ),
-                  SizedBox(height: 8),
-                  // Address
-                  TextFormField(
-                    controller: _customerAddressController,
-                    decoration: InputDecoration(labelText: 'Address'),
-                    validator:
-                        (val) =>
-                            val == null || val.trim().isEmpty
-                                ? 'Enter Address'
-                                : null,
-                    onChanged: (val) => setState(() => _customerAddress = val),
-                  ),
-                  SizedBox(height: 8),
-                  // GSTIN
-                  TextFormField(
-                    controller: _customerGstinController,
-                    decoration: InputDecoration(labelText: 'GSTIN'),
-                    validator: (val) {
-                      if (val == null || val.trim().isEmpty)
-                        return 'Enter GSTIN';
-                      final gstinRegex = RegExp(
-                        r'^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$',
-                      );
-                      if (!gstinRegex.hasMatch(val.trim()))
-                        return 'Enter valid GSTIN';
-                      return null;
-                    },
-                    onChanged: (val) => setState(() => _customerGstin = val),
-                  ),
-                  SizedBox(height: 16),
-                  // ...rest of your widgets...
-                ],
-              ),
-            ),
-            const SizedBox(height: 20),
-            const Text(
-              'Select items for billing:',
-              style: TextStyle(fontSize: 18),
-            ),
-            ...items.asMap().entries.map((entry) {
-              int idx = entry.key;
-              var item = entry.value;
-              return Row(
-                children: [
-                  Checkbox(
-                    value: item.checked,
-                    onChanged: (val) {
-                      setState(() {
-                        item.checked = val!;
-                      });
-                    },
-                  ),
-                  Expanded(child: Text(item.nameOfProduct)),
-                  SizedBox(
-                    width: 60,
-                    child: TextField(
-                      decoration: const InputDecoration(labelText: 'Qty'),
-                      keyboardType: TextInputType.number,
-                      controller: TextEditingController(
-                        text: item.qty.toString(),
-                      ),
-                      onChanged: (val) {
-                        setState(() {
-                          item.qty = int.tryParse(val) ?? 0;
-                        });
-                        _saveItems();
-                      },
-                    ),
-                  ),
-                  SizedBox(width: 8),
-                  SizedBox(
-                    width: 80,
-                    child: TextField(
-                      decoration: const InputDecoration(labelText: 'Rate'),
-                      keyboardType: TextInputType.number,
-                      controller: TextEditingController(
-                        text: item.rate.toString(),
-                      ),
-                      onChanged: (val) {
-                        setState(() {
-                          item.rate = double.tryParse(val) ?? 0;
-                        });
-                        _saveItems();
-                      },
-                    ),
-                  ),
-                  IconButton(
-                    icon: Icon(Icons.delete),
-                    onPressed: () => _deleteItem(idx),
-                  ),
-                ],
-              );
-            }),
-            const SizedBox(height: 20),
-            ElevatedButton.icon(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.deepPurple, // Button color
-                foregroundColor: Colors.white, // Text/Icon color
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 32,
-                  vertical: 16,
-                ),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                textStyle: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  letterSpacing: 1.2,
-                ),
-                elevation: 4,
-              ),
-              icon: const Icon(Icons.picture_as_pdf, size: 24),
-              label: const Text('Generate PDF'),
-              onPressed: () {
-                if (_formKey.currentState!.validate()) {
-                  _generatePdf();
-                }
-              },
-            ),
-            const SizedBox(height: 20),
-            const Text('Add new item:', style: TextStyle(fontSize: 18)),
-            Row(
+      body: SafeArea(
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Expanded(
-                  child: TextField(
-                    controller: _nameController,
-                    decoration: InputDecoration(labelText: 'Name'),
+                Form(
+                  key: _formKey,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Invoice Number
+                      TextFormField(
+                        controller: _invoiceNumberController,
+                        decoration: InputDecoration(
+                          labelText: 'Invoice Number',
+                        ),
+                        validator:
+                            (val) =>
+                                val == null || val.trim().isEmpty
+                                    ? 'Enter Invoice Number'
+                                    : null,
+                        onChanged:
+                            (val) => setState(() => _invoiceNumber = val),
+                      ),
+                      SizedBox(height: 16),
+                      // Name
+                      TextFormField(
+                        controller: _customerNameController,
+                        decoration: InputDecoration(labelText: 'Name'),
+                        validator:
+                            (val) =>
+                                val == null || val.trim().isEmpty
+                                    ? 'Enter Name'
+                                    : null,
+                        onChanged: (val) => setState(() => _customerName = val),
+                      ),
+                      SizedBox(height: 8),
+                      // Address
+                      TextFormField(
+                        controller: _customerAddressController,
+                        decoration: InputDecoration(labelText: 'Address'),
+                        validator:
+                            (val) =>
+                                val == null || val.trim().isEmpty
+                                    ? 'Enter Address'
+                                    : null,
+                        onChanged:
+                            (val) => setState(() => _customerAddress = val),
+                      ),
+                      SizedBox(height: 8),
+                      // GSTIN
+                      TextFormField(
+                        controller: _customerGstinController,
+                        decoration: InputDecoration(labelText: 'GSTIN'),
+                        validator: (val) {
+                          if (val == null || val.trim().isEmpty) {
+                            return 'Enter GSTIN';
+                          }
+                          final gstinRegex = RegExp(
+                            r'^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$',
+                          );
+                          if (!gstinRegex.hasMatch(val.trim())) {
+                            return 'Enter valid GSTIN';
+                          }
+                          return null;
+                        },
+                        onChanged:
+                            (val) => setState(() => _customerGstin = val),
+                      ),
+                      SizedBox(height: 16),
+                      // ...rest of your widgets...
+                    ],
                   ),
                 ),
-                SizedBox(
-                  width: 60,
-                  child: TextField(
-                    controller: _qtyController,
-                    decoration: InputDecoration(labelText: 'Qty'),
-                    keyboardType: TextInputType.number,
-                  ),
+                const SizedBox(height: 20),
+                const Text(
+                  'Select items for billing:',
+                  style: TextStyle(fontSize: 18),
                 ),
-                SizedBox(
-                  width: 80,
-                  child: TextField(
-                    controller: _rateController,
-                    decoration: InputDecoration(labelText: 'Rate'),
-                    keyboardType: TextInputType.number,
-                  ),
+                ...items.asMap().entries.map((entry) {
+                  int idx = entry.key;
+                  var item = entry.value;
+                  return Row(
+                    children: [
+                      Checkbox(
+                        value: item.checked,
+                        onChanged: (val) {
+                          setState(() {
+                            item.checked = val!;
+                          });
+                        },
+                      ),
+                      Expanded(child: Text(item.nameOfProduct)),
+                      SizedBox(
+                        width: 60,
+                        child: TextField(
+                          decoration: const InputDecoration(labelText: 'Qty'),
+                          keyboardType: TextInputType.number,
+                          controller: TextEditingController(
+                            text: item.qty.toString(),
+                          ),
+                          onChanged: (val) {
+                            setState(() {
+                              item.qty = int.tryParse(val) ?? 0;
+                            });
+                            _saveItems();
+                          },
+                        ),
+                      ),
+                      SizedBox(width: 8),
+                      SizedBox(
+                        width: 80,
+                        child: TextField(
+                          decoration: const InputDecoration(labelText: 'Rate'),
+                          keyboardType: TextInputType.number,
+                          controller: TextEditingController(
+                            text: item.rate.toString(),
+                          ),
+                          onChanged: (val) {
+                            setState(() {
+                              item.rate = double.tryParse(val) ?? 0;
+                            });
+                            _saveItems();
+                          },
+                        ),
+                      ),
+                      IconButton(
+                        icon: Icon(Icons.delete),
+                        onPressed: () => _deleteItem(idx),
+                      ),
+                    ],
+                  );
+                }),
+                const SizedBox(height: 20),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    ElevatedButton.icon(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.deepPurple,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 32,
+                          vertical: 16,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        textStyle: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: 1.2,
+                        ),
+                        elevation: 4,
+                      ),
+                      icon: const Icon(Icons.picture_as_pdf, size: 24),
+                      label: const Text('Generate PDF'),
+                      onPressed: () {
+                        if (_formKey.currentState!.validate()) {
+                          _generatePdf();
+                        }
+                      },
+                    ),
+                  ],
                 ),
-                IconButton(
-                  icon: Icon(Icons.add),
-                  onPressed: () {
-                    final name = _nameController.text;
-                    final qty = int.tryParse(_qtyController.text) ?? 0;
-                    final rate = double.tryParse(_rateController.text) ?? 0;
-                    if (name.isNotEmpty && qty > 0 && rate > 0) {
-                      _addNewItem(name, qty, rate);
-                      _nameController.clear();
-                      _qtyController.clear();
-                      _rateController.clear();
-                    }
-                  },
+                const SizedBox(height: 20),
+                const Text('Add new item:', style: TextStyle(fontSize: 18)),
+                Row(
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        controller: _nameController,
+                        decoration: InputDecoration(labelText: 'Name'),
+                      ),
+                    ),
+                    SizedBox(
+                      width: 60,
+                      child: TextField(
+                        controller: _qtyController,
+                        decoration: InputDecoration(labelText: 'Qty'),
+                        keyboardType: TextInputType.number,
+                      ),
+                    ),
+                    SizedBox(
+                      width: 80,
+                      child: TextField(
+                        controller: _rateController,
+                        decoration: InputDecoration(labelText: 'Rate'),
+                        keyboardType: TextInputType.number,
+                      ),
+                    ),
+                    IconButton(
+                      icon: Icon(Icons.add),
+                      onPressed: () {
+                        final name = _nameController.text;
+                        final qty = int.tryParse(_qtyController.text) ?? 0;
+                        final rate = double.tryParse(_rateController.text) ?? 0;
+                        if (name.isNotEmpty && qty > 0 && rate > 0) {
+                          _addNewItem(name, qty, rate);
+                          _nameController.clear();
+                          _qtyController.clear();
+                          _rateController.clear();
+                        }
+                      },
+                    ),
+                  ],
                 ),
               ],
             ),
-          ],
+          ),
         ),
       ),
     );
