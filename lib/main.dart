@@ -460,10 +460,9 @@ class _MyHomePageState extends State<MyHomePage> {
                       borderRadius: pw.BorderRadius.circular(4),
                     ),
                     padding: const pw.EdgeInsets.all(8),
-                    margin: const pw.EdgeInsets.only(
-                      top: 12,
-                    ), // Optional: space above the box
-                    height: 80, // Adjust height as needed
+                    margin: const pw.EdgeInsets.only(top: 12),
+                    height:
+                        140, // <-- Increased height for more signature space
                     child: pw.Row(
                       crossAxisAlignment: pw.CrossAxisAlignment.stretch,
                       children: [
@@ -474,7 +473,7 @@ class _MyHomePageState extends State<MyHomePage> {
                             alignment: pw.Alignment.topLeft,
                             child: pw.Column(
                               crossAxisAlignment: pw.CrossAxisAlignment.start,
-                              mainAxisAlignment: pw.MainAxisAlignment.start,
+                              mainAxisAlignment: pw.MainAxisAlignment.center,
                               children: [
                                 pw.Text(
                                   'BANK DETAILS :',
@@ -482,8 +481,11 @@ class _MyHomePageState extends State<MyHomePage> {
                                     fontWeight: pw.FontWeight.bold,
                                   ),
                                 ),
+                                pw.SizedBox(height: 8),
                                 pw.Text('Bank Name : TMB, Tiruchengode Branch'),
+                                pw.SizedBox(height: 8),
                                 pw.Text('Ac No: 126150050801310'),
+                                pw.SizedBox(height: 8),
                                 pw.Text('IFSC No : TMBL0000126'),
                               ],
                             ),
@@ -515,7 +517,9 @@ class _MyHomePageState extends State<MyHomePage> {
                                     fontWeight: pw.FontWeight.bold,
                                   ),
                                 ),
-                                pw.SizedBox(height: 18),
+                                pw.SizedBox(
+                                  height: 60,
+                                ), // More space for signature
                                 pw.Text(
                                   'Authorised Signatory',
                                   style: pw.TextStyle(fontSize: 10),
