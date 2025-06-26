@@ -620,14 +620,49 @@ class _MyHomePageState extends State<MyHomePage> {
             ...items.asMap().entries.map((entry) {
               int idx = entry.key;
               var item = entry.value;
-              return CheckboxListTile(
-                title: Text('${item.nameOfProduct} (${item.rate})'),
-                value: item.checked,
-                onChanged: (val) {
-                  setState(() {
-                    item.checked = val!;
-                  });
-                },
+              return Row(
+                children: [
+                  Expanded(child: Text(item.nameOfProduct)),
+                  SizedBox(
+                    width: 60,
+                    child: TextField(
+                      decoration: const InputDecoration(labelText: 'Qty'),
+                      keyboardType: TextInputType.number,
+                      controller: TextEditingController(
+                        text: item.qty.toString(),
+                      ),
+                      onChanged: (val) {
+                        setState(() {
+                          item.qty = int.tryParse(val) ?? 0;
+                        });
+                      },
+                    ),
+                  ),
+                  SizedBox(width: 8),
+                  SizedBox(
+                    width: 80,
+                    child: TextField(
+                      decoration: const InputDecoration(labelText: 'Rate'),
+                      keyboardType: TextInputType.number,
+                      controller: TextEditingController(
+                        text: item.rate.toString(),
+                      ),
+                      onChanged: (val) {
+                        setState(() {
+                          item.rate = double.tryParse(val) ?? 0;
+                        });
+                      },
+                    ),
+                  ),
+                  Checkbox(
+                    value: item.checked,
+                    onChanged: (val) {
+                      setState(() {
+                        item.checked = val!;
+                      });
+                    },
+                  ),
+                ],
               );
             }),
             const SizedBox(height: 20),

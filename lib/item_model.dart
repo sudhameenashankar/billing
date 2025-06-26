@@ -1,8 +1,8 @@
 class InvoiceItem {
   final String nameOfProduct;
   final String hsnOrAcs;
-  final int qty;
-  final double rate;
+  int qty;
+  double rate;
   bool checked;
 
   InvoiceItem({
