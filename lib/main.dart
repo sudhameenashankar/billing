@@ -1,11 +1,10 @@
-import 'dart:convert';
-import 'package:billing/general_utility.dart';
 import 'package:billing/item_model.dart';
 import 'package:flutter/material.dart';
 import 'package:pdf/pdf.dart';
 import 'package:printing/printing.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:number_to_words/number_to_words.dart';
 
 void main() {
   runApp(const MyApp());
@@ -143,7 +142,8 @@ class _MyHomePageState extends State<MyHomePage> {
     final netAmount = totalAmount + sgst + cgst;
 
     // 3. Convert to words
-    final netAmountWords = '${numberToWords(netAmount.round())} Rupees Only';
+    final netAmountWords =
+        '${NumberToWord().convert('en-in', netAmount.round())} Rupees Only';
 
     pdf.addPage(
       pw.Page(
@@ -253,9 +253,38 @@ class _MyHomePageState extends State<MyHomePage> {
                                     fontWeight: pw.FontWeight.bold,
                                   ),
                                 ),
-                                pw.Text(_customerName),
-                                pw.Text(_customerAddress),
-                                pw.Text(_customerGstin),
+                                pw.SizedBox(height: 10),
+                                pw.Row(
+                                  crossAxisAlignment:
+                                      pw.CrossAxisAlignment.start,
+                                  children: [
+                                    pw.Text(
+                                      'Name:',
+                                      style: pw.TextStyle(
+                                        fontWeight: pw.FontWeight.bold,
+                                      ),
+                                    ),
+                                    pw.SizedBox(width: 8),
+                                    pw.Expanded(child: pw.Text(_customerName)),
+                                  ],
+                                ),
+                                pw.SizedBox(height: 10),
+                                pw.Row(
+                                  crossAxisAlignment:
+                                      pw.CrossAxisAlignment.start,
+                                  children: [
+                                    pw.Text(
+                                      'Address:',
+                                      style: pw.TextStyle(
+                                        fontWeight: pw.FontWeight.bold,
+                                      ),
+                                    ),
+                                    pw.SizedBox(width: 8),
+                                    pw.Expanded(
+                                      child: pw.Text(_customerAddress),
+                                    ),
+                                  ],
+                                ),
                               ],
                             ),
                           ),
@@ -270,11 +299,11 @@ class _MyHomePageState extends State<MyHomePage> {
                             child: pw.Column(
                               crossAxisAlignment: pw.CrossAxisAlignment.start,
                               children: [
-                                pw.Text('Transport Mode:'),
+                                pw.Text('Transport Mode: ROAD'),
                                 pw.Divider(thickness: 1),
                                 pw.Text('Vehicle No:'),
                                 pw.Divider(thickness: 1),
-                                pw.Text('Document Through:'),
+                                pw.Text('Document Through: MINI TEMPO'),
                                 pw.Divider(thickness: 1),
                                 // Purchase Order No and Date in a row
                                 pw.Row(
@@ -308,7 +337,9 @@ class _MyHomePageState extends State<MyHomePage> {
                                 // State and State Code in a row
                                 pw.Row(
                                   children: [
-                                    pw.Expanded(child: pw.Text('State:')),
+                                    pw.Expanded(
+                                      child: pw.Text('State: TAMIL NADU'),
+                                    ),
                                     pw.Container(
                                       width: 1,
                                       height: 14,
@@ -317,7 +348,9 @@ class _MyHomePageState extends State<MyHomePage> {
                                         horizontal: 8,
                                       ),
                                     ),
-                                    pw.Expanded(child: pw.Text('State Code:')),
+                                    pw.Expanded(
+                                      child: pw.Text('State Code: 33'),
+                                    ),
                                   ],
                                 ),
                               ],
@@ -461,7 +494,7 @@ class _MyHomePageState extends State<MyHomePage> {
                             pw.Text('Total Tax Amount (in words)'),
                             pw.SizedBox(height: 20),
                             pw.Text(
-                              '${numberToWords((sgst + cgst).round())} Rupees Only',
+                              '${NumberToWord().convert('en-in', (sgst + cgst).round())} Rupees Only',
                               style: pw.TextStyle(
                                 fontWeight: pw.FontWeight.bold,
                                 fontSize: 10,
@@ -513,7 +546,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                   child: pw.Text('Add C GST (2.5%):'),
                                 ),
                                 pw.Text(
-                                  cgst.toStringAsFixed(2),
+                                  cgst.round().toString(),
                                   textAlign: pw.TextAlign.right,
                                 ),
                               ],
@@ -528,7 +561,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                   child: pw.Text('Add S GST (2.5%):'),
                                 ),
                                 pw.Text(
-                                  sgst.toStringAsFixed(2),
+                                  sgst.round().toString(),
                                   textAlign: pw.TextAlign.right,
                                 ),
                               ],
@@ -551,7 +584,7 @@ class _MyHomePageState extends State<MyHomePage> {
                               children: [
                                 pw.Expanded(child: pw.Text('Net Amount:')),
                                 pw.Text(
-                                  netAmount.toStringAsFixed(2),
+                                  netAmount.round().toString(),
                                   textAlign: pw.TextAlign.right,
                                 ),
                               ],
