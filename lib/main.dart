@@ -398,6 +398,7 @@ class _MyHomePageState extends State<MyHomePage> {
                           crossAxisAlignment: pw.CrossAxisAlignment.start,
                           children: [
                             pw.Text('Total Tax Amount (in words)'),
+                            pw.SizedBox(height: 20),
                             pw.Text(
                               '${numberToWords((sgst + cgst).round())} Rupees Only',
                               style: pw.TextStyle(
@@ -405,33 +406,14 @@ class _MyHomePageState extends State<MyHomePage> {
                                 fontSize: 10,
                               ),
                             ),
-                            pw.SizedBox(height: 16),
-                            pw.Container(
-                              margin: const pw.EdgeInsets.symmetric(
-                                vertical: 2,
-                              ),
-                              child: pw.Divider(
-                                thickness: 1,
-                                color: PdfColors.grey700,
-                              ),
-                            ),
                             pw.SizedBox(height: 30),
                             pw.Text('Total Invoice Amount (in words)'),
+                            pw.SizedBox(height: 20),
                             pw.Text(
                               netAmountWords,
                               style: pw.TextStyle(
                                 fontWeight: pw.FontWeight.bold,
                                 fontSize: 10,
-                              ),
-                            ),
-                            pw.SizedBox(height: 16),
-                            pw.Container(
-                              margin: const pw.EdgeInsets.symmetric(
-                                vertical: 2,
-                              ),
-                              child: pw.Divider(
-                                thickness: 1,
-                                color: PdfColors.grey700,
                               ),
                             ),
                           ],
