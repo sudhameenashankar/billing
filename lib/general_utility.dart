@@ -4,3 +4,15 @@ bool isValidGstin(String gstin) {
   );
   return gstinRegex.hasMatch(gstin);
 }
+
+String toPascalCase(String input) {
+  return input
+      .split(RegExp(r'[_\s]+'))
+      .map(
+        (word) =>
+            word.isEmpty
+                ? ''
+                : word[0].toUpperCase() + word.substring(1).toLowerCase(),
+      )
+      .join(' ');
+}

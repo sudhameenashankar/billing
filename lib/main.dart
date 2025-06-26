@@ -1,3 +1,4 @@
+import 'package:billing/general_utility.dart';
 import 'package:billing/item_model.dart';
 import 'package:flutter/material.dart';
 import 'package:pdf/pdf.dart';
@@ -143,7 +144,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
     // 3. Convert to words
     final netAmountWords =
-        '${NumberToWord().convert('en-in', netAmount.round())} Rupees Only';
+        '${toPascalCase(NumberToWord().convert('en-in', netAmount.round()))} Rupees Only';
 
     pdf.addPage(
       pw.Page(
@@ -494,7 +495,7 @@ class _MyHomePageState extends State<MyHomePage> {
                             pw.Text('Total Tax Amount (in words)'),
                             pw.SizedBox(height: 20),
                             pw.Text(
-                              '${NumberToWord().convert('en-in', (sgst + cgst).round())} Rupees Only',
+                              '${toPascalCase(NumberToWord().convert('en-in', (sgst + cgst).round()))} Rupees Only',
                               style: pw.TextStyle(
                                 fontWeight: pw.FontWeight.bold,
                                 fontSize: 10,
