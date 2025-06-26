@@ -37,7 +37,7 @@ class MyApp extends StatelessWidget {
         // tested with just a hot reload.
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      home: const MyHomePage(title: 'Ramasamy Tex Invoice Generator'),
     );
   }
 }
@@ -851,13 +851,31 @@ class _MyHomePageState extends State<MyHomePage> {
               );
             }),
             const SizedBox(height: 20),
-            ElevatedButton(
+            ElevatedButton.icon(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.deepPurple, // Button color
+                foregroundColor: Colors.white, // Text/Icon color
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 32,
+                  vertical: 16,
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                textStyle: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 1.2,
+                ),
+                elevation: 4,
+              ),
+              icon: const Icon(Icons.picture_as_pdf, size: 24),
+              label: const Text('Generate PDF'),
               onPressed: () {
                 if (_formKey.currentState!.validate()) {
                   _generatePdf();
                 }
               },
-              child: const Text('Generate PDF'),
             ),
             const SizedBox(height: 20),
             const Text('Add new item:', style: TextStyle(fontSize: 18)),
