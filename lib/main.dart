@@ -251,6 +251,131 @@ class _MyHomePageState extends State<MyHomePage> {
                       pw.Divider(
                         thickness: 1,
                       ), // Continuous line under both boxes
+                      pw.Container(
+                        constraints: pw.BoxConstraints(minHeight: 300),
+                        child: pw.Table(
+                          border: pw.TableBorder.all(
+                            color: PdfColors.grey700,
+                            width: 1,
+                          ),
+                          columnWidths: {
+                            0: pw.FlexColumnWidth(1), // S No
+                            1: pw.FlexColumnWidth(5), // Name of the Product
+                            2: pw.FlexColumnWidth(2), // HSN / ACS
+                            3: pw.FlexColumnWidth(1), // Qty
+                            4: pw.FlexColumnWidth(2), // Rate
+                            5: pw.FlexColumnWidth(2), // Amount
+                          },
+                          children: [
+                            // Header row
+                            pw.TableRow(
+                              decoration: pw.BoxDecoration(
+                                color: PdfColors.grey300,
+                              ),
+                              children: [
+                                pw.Padding(
+                                  padding: const pw.EdgeInsets.all(4),
+                                  child: pw.Text(
+                                    'S No:',
+                                    style: pw.TextStyle(
+                                      fontWeight: pw.FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                                pw.Padding(
+                                  padding: const pw.EdgeInsets.all(4),
+                                  child: pw.Text(
+                                    'Name of the Product:',
+                                    style: pw.TextStyle(
+                                      fontWeight: pw.FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                                pw.Padding(
+                                  padding: const pw.EdgeInsets.all(4),
+                                  child: pw.Text(
+                                    'HSN / ACS:',
+                                    style: pw.TextStyle(
+                                      fontWeight: pw.FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                                pw.Padding(
+                                  padding: const pw.EdgeInsets.all(4),
+                                  child: pw.Text(
+                                    'Qty',
+                                    style: pw.TextStyle(
+                                      fontWeight: pw.FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                                pw.Padding(
+                                  padding: const pw.EdgeInsets.all(4),
+                                  child: pw.Text(
+                                    'Rate:',
+                                    style: pw.TextStyle(
+                                      fontWeight: pw.FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                                pw.Padding(
+                                  padding: const pw.EdgeInsets.all(4),
+                                  child: pw.Text(
+                                    'Amount\n(RS):',
+                                    style: pw.TextStyle(
+                                      fontWeight: pw.FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            // Data rows
+                            ...selected.asMap().entries.map((entry) {
+                              int idx = entry.key + 1;
+                              var item = entry.value;
+                              return pw.TableRow(
+                                children: [
+                                  pw.Padding(
+                                    padding: const pw.EdgeInsets.all(4),
+                                    child: pw.Text('$idx'),
+                                  ),
+                                  pw.Padding(
+                                    padding: const pw.EdgeInsets.all(4),
+                                    child: pw.Text(item["name"] ?? ''),
+                                  ),
+                                  pw.Padding(
+                                    padding: const pw.EdgeInsets.all(4),
+                                    child: pw.Text(
+                                      item["hsn"] ?? '',
+                                    ), // Add HSN/ACS to your items if needed
+                                  ),
+                                  pw.Padding(
+                                    padding: const pw.EdgeInsets.all(4),
+                                    child: pw.Text(
+                                      item["qty"]?.toString() ?? '1',
+                                    ), // Add qty to your items if needed
+                                  ),
+                                  pw.Padding(
+                                    padding: const pw.EdgeInsets.all(4),
+                                    child: pw.Text(
+                                      item["rate"]?.toString() ??
+                                          (item["price"]?.toString() ?? ''),
+                                    ),
+                                  ),
+                                  pw.Padding(
+                                    padding: const pw.EdgeInsets.all(4),
+                                    child: pw.Text(
+                                      item["amount"]?.toString() ??
+                                          (item["price"]?.toString() ?? ''),
+                                    ),
+                                  ),
+                                ],
+                              );
+                            }),
+                          ],
+                        ),
+                      ),
+                      pw.Divider(thickness: 1),
                     ],
                   ),
                   pw.Row(
