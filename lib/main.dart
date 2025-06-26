@@ -176,17 +176,26 @@ class _MyHomePageState extends State<MyHomePage> {
                                     pw.Text("State Code : 33"),
                                   ],
                                 ),
+                                pw.Divider(thickness: 1),
+                                pw.Text(
+                                  'To:',
+                                  style: pw.TextStyle(
+                                    fontWeight: pw.FontWeight.bold,
+                                  ),
+                                ),
+                                pw.Container(
+                                  width: double.infinity,
+                                  height: 70, // Adjust height as needed
+                                  // child: pw.Text(''), // Leave empty for now, fill later
+                                ),
                               ],
                             ),
                           ),
                           // VERTICAL DIVIDER
                           pw.Container(
                             width: 1.2,
-                            height: 48, // Adjust height as needed
+                            height: 150, // Adjust height as needed
                             color: PdfColors.grey700,
-                            margin: const pw.EdgeInsets.symmetric(
-                              horizontal: 8,
-                            ),
                           ),
                           // RIGHT BOX: Customer details
                           pw.Expanded(
