@@ -383,13 +383,13 @@ class _MyHomePageState extends State<MyHomePage> {
                     children: [
                       // LEFT BOX (60%)
                       pw.Expanded(
-                        flex: 3,
+                        flex: 3, // 60%
                         child: pw.Column(
                           crossAxisAlignment: pw.CrossAxisAlignment.start,
                           children: [
                             // Total Tax Amount (in words)
                             pw.Text('Total Tax Amount (in words)'),
-                            pw.SizedBox(height: 8),
+                            pw.SizedBox(height: 16),
                             pw.Container(
                               margin: const pw.EdgeInsets.symmetric(
                                 vertical: 2,
@@ -399,10 +399,10 @@ class _MyHomePageState extends State<MyHomePage> {
                                 color: PdfColors.grey700,
                               ),
                             ),
-                            pw.SizedBox(height: 8),
+                            pw.SizedBox(height: 45),
                             // Total Invoice Amount (in words)
                             pw.Text('Total Invoice Amount (in words)'),
-                            pw.SizedBox(height: 8),
+                            pw.SizedBox(height: 16),
                             pw.Container(
                               margin: const pw.EdgeInsets.symmetric(
                                 vertical: 2,
@@ -418,13 +418,41 @@ class _MyHomePageState extends State<MyHomePage> {
                       pw.SizedBox(width: 8),
                       // RIGHT BOX (40%)
                       pw.Expanded(
-                        flex: 2,
-                        child: pw.Container(
-                          // Add your right box content here
+                        flex: 2, // 40%
+                        child: pw.Column(
+                          crossAxisAlignment: pw.CrossAxisAlignment.start,
+                          children: [
+                            pw.Text('Total Amount:'),
+                            pw.Divider(
+                              thickness: 0.5,
+                              color: PdfColors.grey400,
+                            ),
+                            pw.Text('Add C GST:'),
+                            pw.Divider(
+                              thickness: 0.5,
+                              color: PdfColors.grey400,
+                            ),
+                            pw.Text('Add S GST:'),
+                            pw.Divider(
+                              thickness: 0.5,
+                              color: PdfColors.grey400,
+                            ),
+                            pw.Text('Add I GST:'),
+                            pw.Divider(
+                              thickness: 0.5,
+                              color: PdfColors.grey400,
+                            ),
+                            pw.Text('Net Amount:'),
+                            pw.Divider(
+                              thickness: 0.5,
+                              color: PdfColors.grey400,
+                            ),
+                          ],
                         ),
                       ),
                     ],
                   ),
+                  pw.Divider(thickness: 1),
                 ],
               ),
             ),
