@@ -449,32 +449,73 @@ class _MyHomePageState extends State<MyHomePage> {
                       pw.Expanded(
                         flex: 2,
                         child: pw.Column(
-                          crossAxisAlignment: pw.CrossAxisAlignment.start,
+                          crossAxisAlignment: pw.CrossAxisAlignment.stretch,
                           children: [
-                            pw.Text(
-                              'Total Amount: ${totalAmount.toStringAsFixed(2)}',
+                            pw.Row(
+                              children: [
+                                pw.Expanded(child: pw.Text('Total Amount:')),
+                                pw.Text(
+                                  totalAmount.toStringAsFixed(2),
+                                  textAlign: pw.TextAlign.right,
+                                ),
+                              ],
                             ),
                             pw.Divider(
                               thickness: 0.5,
                               color: PdfColors.grey400,
                             ),
-                            pw.Text('Add C GST: ${cgst.toStringAsFixed(2)}'),
+                            pw.Row(
+                              children: [
+                                pw.Expanded(
+                                  child: pw.Text('Add C GST (2.5%):'),
+                                ),
+                                pw.Text(
+                                  cgst.toStringAsFixed(2),
+                                  textAlign: pw.TextAlign.right,
+                                ),
+                              ],
+                            ),
                             pw.Divider(
                               thickness: 0.5,
                               color: PdfColors.grey400,
                             ),
-                            pw.Text('Add S GST: ${sgst.toStringAsFixed(2)}'),
+                            pw.Row(
+                              children: [
+                                pw.Expanded(
+                                  child: pw.Text('Add S GST (2.5%):'),
+                                ),
+                                pw.Text(
+                                  sgst.toStringAsFixed(2),
+                                  textAlign: pw.TextAlign.right,
+                                ),
+                              ],
+                            ),
                             pw.Divider(
                               thickness: 0.5,
                               color: PdfColors.grey400,
                             ),
-                            pw.Text('Add I GST: 0.00'),
+                            pw.Row(
+                              children: [
+                                pw.Expanded(child: pw.Text('Add I GST:')),
+                                pw.Text('0.00', textAlign: pw.TextAlign.right),
+                              ],
+                            ),
                             pw.Divider(
                               thickness: 0.5,
                               color: PdfColors.grey400,
                             ),
-                            pw.Text(
-                              'Net Amount: ${netAmount.toStringAsFixed(2)}',
+                            pw.Row(
+                              children: [
+                                pw.Expanded(child: pw.Text('Net Amount:')),
+                                pw.Text(
+                                  netAmount.toStringAsFixed(2),
+                                  textAlign: pw.TextAlign.right,
+                                ),
+                              ],
+                            ),
+                            pw.Divider(
+                              thickness: 0.5,
+                              color: PdfColors.grey400,
                             ),
                           ],
                         ),
