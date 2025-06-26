@@ -868,6 +868,26 @@ class _MyHomePageState extends State<MyHomePage> {
                       label: const Text('Generate PDF'),
                       onPressed: () {
                         if (_formKey.currentState!.validate()) {
+                          // Check that all checked items have qty > 0 and rate > 0
+                          final invalidChecked =
+                              items
+                                  .where(
+                                    (item) =>
+                                        item.checked &&
+                                        (item.qty == 0 || item.rate == 0),
+                                  )
+                                  .toList();
+                          if (invalidChecked.isNotEmpty) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(
+                                  'All selected items must have Quantity and Rate greater than 0.',
+                                ),
+                                backgroundColor: Colors.red,
+                              ),
+                            );
+                            return;
+                          }
                           _generatePdf();
                         }
                       },
@@ -882,6 +902,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       child: TextField(
                         controller: _nameController,
                         decoration: InputDecoration(labelText: 'Name'),
+                        inputFormatters: [UpperCaseTextFormatter()],
                       ),
                     ),
                     SizedBox(
