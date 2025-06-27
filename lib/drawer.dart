@@ -4,14 +4,27 @@ import 'package:billing/pdf_preview_page.dart';
 import 'dart:io';
 import 'dart:convert';
 
-class InvoiceDrawer extends StatelessWidget {
+class InvoiceDrawer extends StatefulWidget {
   const InvoiceDrawer({super.key});
+
+  @override
+  State<InvoiceDrawer> createState() => _InvoiceDrawerState();
+}
+
+class _InvoiceDrawerState extends State<InvoiceDrawer> {
+  late Future<SharedPreferences> _prefsFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _prefsFuture = SharedPreferences.getInstance();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Drawer(
       child: FutureBuilder(
-        future: SharedPreferences.getInstance(),
+        future: _prefsFuture,
         builder: (context, snapshot) {
           if (!snapshot.hasData) {
             return const Center(child: CircularProgressIndicator());
@@ -35,9 +48,9 @@ class InvoiceDrawer extends StatelessWidget {
                   icon: const Icon(Icons.delete, color: Colors.red),
                   onPressed: () async {
                     invoices.removeAt(index);
-                    final updated = invoices.map((e) => e.toString()).toList();
+                    final updated = invoices.map((e) => jsonEncode(e)).toList();
                     await prefs.setStringList('saved_invoices', updated);
-                    (context as Element).reassemble(); // Quick refresh
+                    setState(() {});
                   },
                 ),
                 onTap: () {

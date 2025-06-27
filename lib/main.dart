@@ -2,11 +2,9 @@ import 'package:billing/drawer.dart';
 import 'package:billing/general_utility.dart';
 import 'package:billing/item_model.dart';
 import 'package:billing/pdf_preview_page.dart';
-import 'package:billing/saved_invoices_page.dart';
 import 'package:billing/services';
 import 'package:flutter/material.dart';
 import 'package:pdf/pdf.dart';
-import 'package:printing/printing.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:number_to_words/number_to_words.dart';
@@ -118,9 +116,9 @@ class _MyHomePageState extends State<MyHomePage> {
     );
 
     // 2. Calculate taxes
-    final sgst = (totalAmount * 0.025).round();
-    final cgst = (totalAmount * 0.025).round();
-    final netAmount = totalAmount.round() + sgst + cgst;
+    final sgst = (totalAmount * 0.025).round().toDouble();
+    final cgst = (totalAmount * 0.025).round().toDouble();
+    final netAmount = (totalAmount.round() + sgst + cgst).toDouble();
 
     // 3. Convert to words
     final netAmountWords =
@@ -527,7 +525,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                   child: pw.Text('Add C GST (2.5%):'),
                                 ),
                                 pw.Text(
-                                  cgst.round().toString(),
+                                  cgst.toString(),
                                   textAlign: pw.TextAlign.right,
                                 ),
                               ],
@@ -542,7 +540,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                   child: pw.Text('Add S GST (2.5%):'),
                                 ),
                                 pw.Text(
-                                  sgst.round().toString(),
+                                  sgst.toString(),
                                   textAlign: pw.TextAlign.right,
                                 ),
                               ],
@@ -565,7 +563,7 @@ class _MyHomePageState extends State<MyHomePage> {
                               children: [
                                 pw.Expanded(child: pw.Text('Net Amount:')),
                                 pw.Text(
-                                  netAmount.round().toString(),
+                                  netAmount.toString(),
                                   textAlign: pw.TextAlign.right,
                                 ),
                               ],
