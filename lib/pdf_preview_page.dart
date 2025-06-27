@@ -27,7 +27,11 @@ class PdfPreviewPage extends StatelessWidget {
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.share, size: 30),
+            icon: const Icon(
+              Icons.share,
+              size: 30,
+              color: Colors.deepPurpleAccent,
+            ),
             onPressed: () {
               SharePlus.instance.share(
                 ShareParams(files: [XFile(pdfFile.path)], text: 'Invoice PDF'),
@@ -36,7 +40,11 @@ class PdfPreviewPage extends StatelessWidget {
           ),
           SizedBox(width: 16),
           IconButton(
-            icon: const Icon(Icons.save, size: 30),
+            icon: const Icon(
+              Icons.download,
+              size: 30,
+              color: Colors.blueAccent,
+            ),
             onPressed: () async {
               final prefs = await SharedPreferences.getInstance();
               final List<String> savedInvoices =
