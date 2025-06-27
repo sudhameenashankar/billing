@@ -118,9 +118,9 @@ class _MyHomePageState extends State<MyHomePage> {
     );
 
     // 2. Calculate taxes
-    final sgst = totalAmount * 0.025;
-    final cgst = totalAmount * 0.025;
-    final netAmount = totalAmount.round() + sgst.round() + cgst.round();
+    final sgst = (totalAmount * 0.025).round();
+    final cgst = (totalAmount * 0.025).round();
+    final netAmount = totalAmount.round() + sgst + cgst;
 
     // 3. Convert to words
     final netAmountWords =
