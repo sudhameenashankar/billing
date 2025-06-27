@@ -10,6 +10,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:number_to_words/number_to_words.dart';
 import 'dart:io';
 import 'package:path_provider/path_provider.dart';
+import 'dart:convert';
 
 void main() {
   runApp(const MyApp());
@@ -68,10 +69,13 @@ class _MyHomePageState extends State<MyHomePage> {
 
   final _formKey = GlobalKey<FormState>();
 
+  List<Map<String, String>> _customerSuggestions = [];
+
   @override
   void initState() {
     super.initState();
     _loadItems();
+    _loadCustomerSuggestions();
   }
 
   Future<void> _loadItems() async {
@@ -99,6 +103,17 @@ class _MyHomePageState extends State<MyHomePage> {
     // Save only the names
     final names = items.map((e) => e.nameOfProduct).toList();
     await prefs.setStringList('invoice_item_names', names);
+  }
+
+  Future<void> _loadCustomerSuggestions() async {
+    final prefs = await SharedPreferences.getInstance();
+    final List<String> customers = prefs.getStringList('customers') ?? [];
+    setState(() {
+      _customerSuggestions =
+          customers
+              .map((c) => Map<String, String>.from(jsonDecode(c)))
+              .toList();
+    });
   }
 
   Future<void> _generatePdf() async {
@@ -766,25 +781,61 @@ class _MyHomePageState extends State<MyHomePage> {
                       ),
                       SizedBox(height: 8),
                       // GSTIN
-                      TextFormField(
-                        controller: _customerGstinController,
-                        decoration: InputDecoration(labelText: 'GSTIN'),
-                        textCapitalization: TextCapitalization.characters,
-                        inputFormatters: [UpperCaseTextFormatter()],
-                        validator: (val) {
-                          if (val == null || val.trim().isEmpty) {
-                            return 'Enter GSTIN';
+                      Autocomplete<Map<String, String>>(
+                        optionsBuilder: (TextEditingValue textEditingValue) {
+                          if (textEditingValue.text.isEmpty) {
+                            return const Iterable<Map<String, String>>.empty();
                           }
-                          final gstinRegex = RegExp(
-                            r'^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$',
+                          return _customerSuggestions.where(
+                            (customer) =>
+                                customer['gstin']!.toUpperCase().startsWith(
+                                  textEditingValue.text.toUpperCase(),
+                                ),
                           );
-                          if (!gstinRegex.hasMatch(val.trim())) {
-                            return 'Enter valid GSTIN';
-                          }
-                          return null;
                         },
-                        onChanged:
-                            (val) => setState(() => _customerGstin = val),
+                        displayStringForOption: (option) => option['gstin']!,
+                        fieldViewBuilder: (
+                          context,
+                          controller,
+                          focusNode,
+                          onFieldSubmitted,
+                        ) {
+                          _customerGstinController.text = controller.text;
+                          return TextFormField(
+                            controller: controller,
+                            focusNode: focusNode,
+                            decoration: const InputDecoration(
+                              labelText: 'GSTIN',
+                            ),
+                            textCapitalization: TextCapitalization.characters,
+                            inputFormatters: [UpperCaseTextFormatter()],
+                            validator: (val) {
+                              if (val == null || val.trim().isEmpty) {
+                                return 'Enter GSTIN';
+                              }
+                              final gstinRegex = RegExp(
+                                r'^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$',
+                              );
+                              if (!gstinRegex.hasMatch(val.trim())) {
+                                return 'Enter valid GSTIN';
+                              }
+                              return null;
+                            },
+                            onChanged:
+                                (val) => setState(() => _customerGstin = val),
+                          );
+                        },
+                        onSelected: (Map<String, String> selection) {
+                          _customerGstinController.text = selection['gstin']!;
+                          _customerNameController.text = selection['name']!;
+                          _customerAddressController.text =
+                              selection['address']!;
+                          setState(() {
+                            _customerGstin = selection['gstin']!;
+                            _customerName = selection['name']!;
+                            _customerAddress = selection['address']!;
+                          });
+                        },
                       ),
                       SizedBox(height: 16),
                       // ...rest of your widgets...
@@ -874,7 +925,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       ),
                       icon: const Icon(Icons.picture_as_pdf, size: 24),
                       label: const Text('Generate PDF'),
-                      onPressed: () {
+                      onPressed: () async {
                         if (_formKey.currentState!.validate()) {
                           // Check that all checked items have qty > 0 and rate > 0
                           final invalidChecked =
@@ -896,6 +947,27 @@ class _MyHomePageState extends State<MyHomePage> {
                             );
                             return;
                           }
+
+                          // --- Save customer data ---
+                          final prefs = await SharedPreferences.getInstance();
+                          final List<String> customers =
+                              prefs.getStringList('customers') ?? [];
+                          final customerData = {
+                            'gstin': _customerGstinController.text.trim(),
+                            'name': _customerNameController.text.trim(),
+                            'address': _customerAddressController.text.trim(),
+                          };
+                          final encoded = jsonEncode(customerData);
+                          // Avoid duplicates by GSTIN
+                          if (!customers.any(
+                            (c) =>
+                                jsonDecode(c)['gstin'] == customerData['gstin'],
+                          )) {
+                            customers.add(encoded);
+                            await prefs.setStringList('customers', customers);
+                            await _loadCustomerSuggestions(); // <-- Refresh suggestions!
+                          }
+
                           _generatePdf();
                         }
                       },
