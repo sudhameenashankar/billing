@@ -1,6 +1,8 @@
+import 'package:billing/drawer.dart';
 import 'package:billing/general_utility.dart';
 import 'package:billing/item_model.dart';
 import 'package:billing/pdf_preview_page.dart';
+import 'package:billing/saved_invoices_page.dart';
 import 'package:billing/services';
 import 'package:flutter/material.dart';
 import 'package:pdf/pdf.dart';
@@ -10,7 +12,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:number_to_words/number_to_words.dart';
 import 'dart:io';
 import 'package:path_provider/path_provider.dart';
-import 'package:pdf/widgets.dart' as pw;
 
 void main() {
   runApp(const MyApp());
@@ -32,21 +33,6 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // TRY THIS: Try running your application with "flutter run". You'll see
-        // the application has a purple toolbar. Then, without quitting the app,
-        // try changing the seedColor in the colorScheme below to Colors.green
-        // and then invoke "hot reload" (save your changes or press the "hot
-        // reload" button in a Flutter-supported IDE, or press "r" if you used
-        // the command line to start the app).
-        //
-        // Notice that the counter didn't reset back to zero; the application
-        // state is not lost during the reload. To reset the state, use hot
-        // restart instead.
-        //
-        // This works for code too, not just values: Most code changes can be
-        // tested with just a hot reload.
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
       home: const MyHomePage(title: 'Ramasamy Tex Invoice Generator'),
@@ -64,8 +50,6 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-
   List<InvoiceItem> items = [];
 
   final _nameController = TextEditingController();
@@ -73,7 +57,7 @@ class _MyHomePageState extends State<MyHomePage> {
   final _rateController = TextEditingController();
 
   String _invoiceNumber = '';
-  DateTime _invoiceDate = DateTime.now();
+  final DateTime _invoiceDate = DateTime.now();
   final _invoiceNumberController = TextEditingController();
 
   final _customerNameController = TextEditingController();
@@ -718,6 +702,7 @@ class _MyHomePageState extends State<MyHomePage> {
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         title: Text(widget.title),
       ),
+      drawer: InvoiceDrawer(),
       body: SafeArea(
         child: SingleChildScrollView(
           child: Padding(
@@ -956,6 +941,17 @@ class _MyHomePageState extends State<MyHomePage> {
                       },
                     ),
                   ],
+                ),
+                ElevatedButton(
+                  child: const Text('View Saved Invoices'),
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const SavedInvoicesPage(),
+                      ),
+                    );
+                  },
                 ),
               ],
             ),
