@@ -1,5 +1,6 @@
 import 'package:billing/general_utility.dart';
 import 'package:billing/item_model.dart';
+import 'package:billing/pdf_preview_page.dart';
 import 'package:billing/services';
 import 'package:flutter/material.dart';
 import 'package:pdf/pdf.dart';
@@ -7,9 +8,19 @@ import 'package:printing/printing.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:number_to_words/number_to_words.dart';
+import 'dart:io';
+import 'package:path_provider/path_provider.dart';
+import 'package:pdf/widgets.dart' as pw;
 
 void main() {
   runApp(const MyApp());
+}
+
+Future<File> _savePdfToFile(pw.Document pdf) async {
+  final output = await getTemporaryDirectory();
+  final file = File('${output.path}/invoice.pdf');
+  await file.writeAsBytes(await pdf.save());
+  return file;
 }
 
 class MyApp extends StatelessWidget {
@@ -668,7 +679,15 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
     );
 
-    await Printing.layoutPdf(onLayout: (format) => pdf.save());
+    final file = await _savePdfToFile(pdf);
+
+    // Navigate to PDF preview with zoom and share
+    if (mounted) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (_) => PdfPreviewPage(pdfFile: file)),
+      );
+    }
   }
 
   void _deleteItem(int index) {
@@ -903,6 +922,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         controller: _nameController,
                         decoration: InputDecoration(labelText: 'Name'),
                         inputFormatters: [UpperCaseTextFormatter()],
+                        textCapitalization: TextCapitalization.characters,
                       ),
                     ),
                     SizedBox(
