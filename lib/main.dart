@@ -749,7 +749,13 @@ class _MyHomePageState extends State<MyHomePage> {
                       // Address
                       TextFormField(
                         controller: _customerAddressController,
-                        decoration: InputDecoration(labelText: 'Address'),
+                        decoration: const InputDecoration(
+                          labelText: 'Address',
+                          alignLabelWithHint:
+                              true, // aligns label at the top for multiline
+                        ),
+                        maxLines: 6, // or any number you prefer
+                        minLines: 3, // optional, for minimum height
                         textCapitalization: TextCapitalization.characters,
                         inputFormatters: [UpperCaseTextFormatter()],
                         validator:
@@ -941,17 +947,6 @@ class _MyHomePageState extends State<MyHomePage> {
                       },
                     ),
                   ],
-                ),
-                ElevatedButton(
-                  child: const Text('View Saved Invoices'),
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => const SavedInvoicesPage(),
-                      ),
-                    );
-                  },
                 ),
               ],
             ),
