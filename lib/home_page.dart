@@ -99,10 +99,6 @@ class _HomePageState extends State<HomePage> {
     final last = prefs.getString('last_invoice_number') ?? '';
     setState(() {
       _lastInvoiceNumber = last;
-      if (_invoiceNumberController.text.isEmpty && last.isNotEmpty) {
-        _invoiceNumberController.text = last;
-        _invoiceNumber = last;
-      }
     });
   }
 
