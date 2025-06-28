@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../pdf_service.dart';
 
 class ShareWhatsappButton extends StatelessWidget {
@@ -10,7 +11,7 @@ class ShareWhatsappButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return FloatingActionButton.extended(
       heroTag: 'whatsapp',
-      icon: const Icon(Icons.share, color: Colors.white),
+      icon: const FaIcon(FontAwesomeIcons.whatsapp, color: Colors.white),
       label: const Text('WhatsApp'),
       backgroundColor: Colors.green,
       foregroundColor: Colors.white,

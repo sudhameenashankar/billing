@@ -1,3 +1,4 @@
+import 'package:billing/general_utility.dart';
 import 'package:flutter/material.dart';
 
 class AddItemSection extends StatelessWidget {
@@ -22,6 +23,8 @@ class AddItemSection extends StatelessWidget {
           child: TextFormField(
             controller: nameController,
             decoration: const InputDecoration(labelText: 'Item Name'),
+            textCapitalization: TextCapitalization.characters,
+            inputFormatters: [UpperCaseTextFormatter()],
           ),
         ),
         SizedBox(width: 8),

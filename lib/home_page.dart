@@ -900,28 +900,11 @@ class _HomePageState extends State<HomePage> {
                   },
                 ),
                 const SizedBox(height: 20),
-                const Text('Add new item:', style: TextStyle(fontSize: 18)),
-                AddItemSection(
-                  nameController: _nameController,
-                  qtyController: _qtyController,
-                  rateController: _rateController,
-                  onAddItem: () {
-                    final name = _nameController.text;
-                    final qty = int.tryParse(_qtyController.text) ?? 0;
-                    final rate = double.tryParse(_rateController.text) ?? 0;
-                    if (name.isNotEmpty && qty > 0 && rate > 0) {
-                      _addNewItem(name, qty, rate);
-                      _nameController.clear();
-                      _qtyController.clear();
-                      _rateController.clear();
-                    }
-                  },
-                ),
-                const SizedBox(height: 20),
                 ElevatedButton.icon(
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.deepPurple,
                     foregroundColor: Colors.white,
+                    alignment: Alignment.center,
                     padding: const EdgeInsets.symmetric(
                       horizontal: 32,
                       vertical: 16,
@@ -998,6 +981,24 @@ class _HomePageState extends State<HomePage> {
                               await _generatePdf();
                             }
                           },
+                ),
+                const SizedBox(height: 20),
+                const Text('Add new item:', style: TextStyle(fontSize: 18)),
+                AddItemSection(
+                  nameController: _nameController,
+                  qtyController: _qtyController,
+                  rateController: _rateController,
+                  onAddItem: () {
+                    final name = _nameController.text;
+                    final qty = int.tryParse(_qtyController.text) ?? 0;
+                    final rate = double.tryParse(_rateController.text) ?? 0;
+                    if (name.isNotEmpty && qty > 0 && rate > 0) {
+                      _addNewItem(name, qty, rate);
+                      _nameController.clear();
+                      _qtyController.clear();
+                      _rateController.clear();
+                    }
+                  },
                 ),
               ],
             ),
