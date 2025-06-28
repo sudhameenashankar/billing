@@ -10,6 +10,8 @@ import 'package:path_provider/path_provider.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'dart:convert';
 import 'package:pdf/pdf.dart';
+import 'package:billing/widgets/items_list_section.dart';
+import 'package:billing/widgets/add_item_section.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key, required this.title});
@@ -33,6 +35,9 @@ class _HomePageState extends State<HomePage> {
   final _customerNameController = TextEditingController();
   final _customerAddressController = TextEditingController();
   final _customerGstinController = TextEditingController();
+
+  // Add a dedicated FocusNode for GSTIN
+  final FocusNode _customerGstinFocusNode = FocusNode();
 
   String _customerName = '';
   String _customerAddress = '';
@@ -820,6 +825,8 @@ class _HomePageState extends State<HomePage> {
                             _customerGstin = selection['gstin']!;
                             _customerAddress = selection['address']!;
                           });
+                          // Request focus for GSTIN field after autofill
+                          _customerGstinFocusNode.requestFocus();
                         },
                       ),
                       SizedBox(height: 8),
@@ -844,61 +851,26 @@ class _HomePageState extends State<HomePage> {
                       ),
                       SizedBox(height: 8),
                       // GSTIN
-                      Autocomplete<Map<String, String>>(
-                        key: Key(_customerGstinController.text),
-                        optionsBuilder: (TextEditingValue textEditingValue) {
-                          if (textEditingValue.text.isEmpty) {
-                            return const Iterable<Map<String, String>>.empty();
+                      TextFormField(
+                        controller: _customerGstinController,
+                        focusNode: _customerGstinFocusNode,
+                        decoration: const InputDecoration(labelText: 'GSTIN'),
+                        textCapitalization: TextCapitalization.characters,
+                        inputFormatters: [UpperCaseTextFormatter()],
+                        validator: (val) {
+                          if (val == null || val.trim().isEmpty) {
+                            return 'Enter GSTIN';
                           }
-                          return _customerSuggestions.where(
-                            (customer) =>
-                                customer['gstin']!.toUpperCase().startsWith(
-                                  textEditingValue.text.toUpperCase(),
-                                ),
+                          final gstinRegex = RegExp(
+                            r'^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$',
                           );
+                          if (!gstinRegex.hasMatch(val.trim())) {
+                            return 'Enter valid GSTIN';
+                          }
+                          return null;
                         },
-                        displayStringForOption: (option) => option['gstin']!,
-                        fieldViewBuilder: (
-                          context,
-                          _,
-                          focusNode,
-                          onFieldSubmitted,
-                        ) {
-                          return TextFormField(
-                            controller: _customerGstinController,
-                            focusNode: focusNode,
-                            decoration: const InputDecoration(
-                              labelText: 'GSTIN',
-                            ),
-                            textCapitalization: TextCapitalization.characters,
-                            inputFormatters: [UpperCaseTextFormatter()],
-                            validator: (val) {
-                              if (val == null || val.trim().isEmpty) {
-                                return 'Enter GSTIN';
-                              }
-                              final gstinRegex = RegExp(
-                                r'^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$',
-                              );
-                              if (!gstinRegex.hasMatch(val.trim())) {
-                                return 'Enter valid GSTIN';
-                              }
-                              return null;
-                            },
-                            onChanged:
-                                (val) => setState(() => _customerGstin = val),
-                          );
-                        },
-                        onSelected: (Map<String, String> selection) {
-                          _customerGstinController.text = selection['gstin']!;
-                          _customerNameController.text = selection['name']!;
-                          _customerAddressController.text =
-                              selection['address']!;
-                          setState(() {
-                            _customerGstin = selection['gstin']!;
-                            _customerName = selection['name']!;
-                            _customerAddress = selection['address']!;
-                          });
-                        },
+                        onChanged:
+                            (val) => setState(() => _customerGstin = val),
                       ),
                       SizedBox(height: 16),
                       // ...rest of your widgets...
@@ -906,198 +878,126 @@ class _HomePageState extends State<HomePage> {
                   ),
                 ),
                 const SizedBox(height: 20),
-                const Text(
-                  'Select items for billing:',
-                  style: TextStyle(fontSize: 18),
-                ),
-                ...items.asMap().entries.map((entry) {
-                  int idx = entry.key;
-                  var item = entry.value;
-                  return Row(
-                    children: [
-                      Checkbox(
-                        value: item.checked,
-                        onChanged: (val) {
-                          setState(() {
-                            item.checked = val!;
-                          });
-                        },
-                      ),
-                      Expanded(child: Text(item.nameOfProduct)),
-                      SizedBox(
-                        width: 60,
-                        child: TextFormField(
-                          initialValue:
-                              item.qty == 0 ? '' : item.qty.toString(),
-                          textCapitalization: TextCapitalization.characters,
-                          inputFormatters: [UpperCaseTextFormatter()],
-                          decoration: const InputDecoration(labelText: 'Qty'),
-                          keyboardType: TextInputType.number,
-                          onChanged: (val) {
-                            setState(() {
-                              item.qty = int.tryParse(val) ?? 0;
-                            });
-                            _saveItems();
-                          },
-                        ),
-                      ),
-                      SizedBox(width: 8),
-                      SizedBox(
-                        width: 80,
-                        child: TextFormField(
-                          initialValue:
-                              item.rate == 0 ? '' : item.rate.toString(),
-                          decoration: const InputDecoration(labelText: 'Rate'),
-                          keyboardType: TextInputType.number,
-                          onChanged: (val) {
-                            setState(() {
-                              item.rate = double.tryParse(val) ?? 0;
-                            });
-                            _saveItems();
-                          },
-                        ),
-                      ),
-                      IconButton(
-                        icon: Icon(Icons.delete),
-                        onPressed: () => _deleteItem(idx),
-                      ),
-                    ],
-                  );
-                }),
-                const SizedBox(height: 20),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    ElevatedButton.icon(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.deepPurple,
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 32,
-                          vertical: 16,
-                        ),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        textStyle: const TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          letterSpacing: 1.2,
-                        ),
-                        elevation: 4,
-                      ),
-                      icon:
-                          _isGenerating
-                              ? const SizedBox(
-                                width: 24,
-                                height: 24,
-                                child: CircularProgressIndicator(
-                                  color: Colors.white,
-                                  strokeWidth: 2.5,
-                                ),
-                              )
-                              : const Icon(Icons.picture_as_pdf, size: 24),
-                      label: Text(
-                        _isGenerating ? 'Generating...' : 'Generate PDF',
-                      ),
-                      onPressed:
-                          _isGenerating
-                              ? null
-                              : () async {
-                                if (_formKey.currentState!.validate()) {
-                                  final invalidChecked =
-                                      items
-                                          .where(
-                                            (item) =>
-                                                item.checked &&
-                                                (item.qty == 0 ||
-                                                    item.rate == 0),
-                                          )
-                                          .toList();
-                                  if (invalidChecked.isNotEmpty) {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(
-                                        content: Text(
-                                          'All selected items must have Quantity and Rate greater than 0.',
-                                        ),
-                                        backgroundColor: Colors.red,
-                                      ),
-                                    );
-                                    return;
-                                  }
-                                  final prefs =
-                                      await SharedPreferences.getInstance();
-                                  final List<String> customers =
-                                      prefs.getStringList('customers') ?? [];
-                                  final customerData = {
-                                    'gstin':
-                                        _customerGstinController.text.trim(),
-                                    'name': _customerNameController.text.trim(),
-                                    'address':
-                                        _customerAddressController.text.trim(),
-                                  };
-                                  final encoded = jsonEncode(customerData);
-                                  if (!customers.any(
-                                    (c) =>
-                                        jsonDecode(c)['gstin'] ==
-                                        customerData['gstin'],
-                                  )) {
-                                    customers.add(encoded);
-                                    await prefs.setStringList(
-                                      'customers',
-                                      customers,
-                                    );
-                                    await _loadCustomerSuggestions();
-                                  }
-                                  await _generatePdf();
-                                }
-                              },
-                    ),
-                  ],
+                ItemsListSection(
+                  items: items,
+                  onDeleteItem: (idx) => _deleteItem(idx),
+                  onQtyChanged: (idx, qty) {
+                    setState(() {
+                      items[idx].qty = qty;
+                    });
+                    _saveItems();
+                  },
+                  onRateChanged: (idx, rate) {
+                    setState(() {
+                      items[idx].rate = rate;
+                    });
+                    _saveItems();
+                  },
+                  onCheckedChanged: (idx, checked) {
+                    setState(() {
+                      items[idx].checked = checked;
+                    });
+                  },
                 ),
                 const SizedBox(height: 20),
                 const Text('Add new item:', style: TextStyle(fontSize: 18)),
-                Row(
-                  children: [
-                    Expanded(
-                      child: TextField(
-                        controller: _nameController,
-                        decoration: InputDecoration(labelText: 'Name'),
-                        inputFormatters: [UpperCaseTextFormatter()],
-                        textCapitalization: TextCapitalization.characters,
-                      ),
+                AddItemSection(
+                  nameController: _nameController,
+                  qtyController: _qtyController,
+                  rateController: _rateController,
+                  onAddItem: () {
+                    final name = _nameController.text;
+                    final qty = int.tryParse(_qtyController.text) ?? 0;
+                    final rate = double.tryParse(_rateController.text) ?? 0;
+                    if (name.isNotEmpty && qty > 0 && rate > 0) {
+                      _addNewItem(name, qty, rate);
+                      _nameController.clear();
+                      _qtyController.clear();
+                      _rateController.clear();
+                    }
+                  },
+                ),
+                const SizedBox(height: 20),
+                ElevatedButton.icon(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.deepPurple,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 32,
+                      vertical: 16,
                     ),
-                    SizedBox(
-                      width: 60,
-                      child: TextField(
-                        controller: _qtyController,
-                        decoration: InputDecoration(labelText: 'Qty'),
-                        keyboardType: TextInputType.number,
-                      ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
                     ),
-                    SizedBox(
-                      width: 80,
-                      child: TextField(
-                        controller: _rateController,
-                        decoration: InputDecoration(labelText: 'Rate'),
-                        keyboardType: TextInputType.number,
-                      ),
+                    textStyle: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 1.2,
                     ),
-                    IconButton(
-                      icon: Icon(Icons.add),
-                      onPressed: () {
-                        final name = _nameController.text;
-                        final qty = int.tryParse(_qtyController.text) ?? 0;
-                        final rate = double.tryParse(_rateController.text) ?? 0;
-                        if (name.isNotEmpty && qty > 0 && rate > 0) {
-                          _addNewItem(name, qty, rate);
-                          _nameController.clear();
-                          _qtyController.clear();
-                          _rateController.clear();
-                        }
-                      },
-                    ),
-                  ],
+                    elevation: 4,
+                  ),
+                  icon:
+                      _isGenerating
+                          ? const SizedBox(
+                            width: 24,
+                            height: 24,
+                            child: CircularProgressIndicator(
+                              color: Colors.white,
+                              strokeWidth: 2.5,
+                            ),
+                          )
+                          : const Icon(Icons.picture_as_pdf, size: 24),
+                  label: Text(_isGenerating ? 'Generating...' : 'Generate PDF'),
+                  onPressed:
+                      _isGenerating
+                          ? null
+                          : () async {
+                            if (_formKey.currentState!.validate()) {
+                              final invalidChecked =
+                                  items
+                                      .where(
+                                        (item) =>
+                                            item.checked &&
+                                            (item.qty == 0 || item.rate == 0),
+                                      )
+                                      .toList();
+                              if (invalidChecked.isNotEmpty) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text(
+                                      'All selected items must have Quantity and Rate greater than 0.',
+                                    ),
+                                    backgroundColor: Colors.red,
+                                  ),
+                                );
+                                return;
+                              }
+                              final prefs =
+                                  await SharedPreferences.getInstance();
+                              final List<String> customers =
+                                  prefs.getStringList('customers') ?? [];
+                              final customerData = {
+                                'gstin': _customerGstinController.text.trim(),
+                                'name': _customerNameController.text.trim(),
+                                'address':
+                                    _customerAddressController.text.trim(),
+                              };
+                              final encoded = jsonEncode(customerData);
+                              if (!customers.any(
+                                (c) =>
+                                    jsonDecode(c)['gstin'] ==
+                                    customerData['gstin'],
+                              )) {
+                                customers.add(encoded);
+                                await prefs.setStringList(
+                                  'customers',
+                                  customers,
+                                );
+                                await _loadCustomerSuggestions();
+                              }
+                              await _generatePdf();
+                            }
+                          },
                 ),
               ],
             ),
