@@ -226,7 +226,7 @@ class _HomePageState extends State<HomePage> {
                               child: pw.Column(
                                 crossAxisAlignment: pw.CrossAxisAlignment.start,
                                 children: [
-                                  pw.Text('INVOICE NO :  2_invoiceNumber'),
+                                  pw.Text('INVOICE NO : $_invoiceNumber'),
                                   pw.Text(
                                     'INVOICE DATE : '
                                     '${_invoiceDate.day.toString().padLeft(2, '0')}/'
@@ -900,87 +900,95 @@ class _HomePageState extends State<HomePage> {
                   },
                 ),
                 const SizedBox(height: 20),
-                ElevatedButton.icon(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.deepPurple,
-                    foregroundColor: Colors.white,
-                    alignment: Alignment.center,
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 32,
-                      vertical: 16,
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    ElevatedButton.icon(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.deepPurple,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 32,
+                          vertical: 16,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        textStyle: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: 1.2,
+                        ),
+                        elevation: 4,
+                      ),
+                      icon:
+                          _isGenerating
+                              ? const SizedBox(
+                                width: 24,
+                                height: 24,
+                                child: CircularProgressIndicator(
+                                  color: Colors.white,
+                                  strokeWidth: 2.5,
+                                ),
+                              )
+                              : const Icon(Icons.picture_as_pdf, size: 24),
+                      label: Text(
+                        _isGenerating ? 'Generating...' : 'Generate PDF',
+                      ),
+                      onPressed:
+                          _isGenerating
+                              ? null
+                              : () async {
+                                if (_formKey.currentState!.validate()) {
+                                  final invalidChecked =
+                                      items
+                                          .where(
+                                            (item) =>
+                                                item.checked &&
+                                                (item.qty == 0 ||
+                                                    item.rate == 0),
+                                          )
+                                          .toList();
+                                  if (invalidChecked.isNotEmpty) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text(
+                                          'All selected items must have Quantity and Rate greater than 0.',
+                                        ),
+                                        backgroundColor: Colors.red,
+                                      ),
+                                    );
+                                    return;
+                                  }
+                                  final prefs =
+                                      await SharedPreferences.getInstance();
+                                  final List<String> customers =
+                                      prefs.getStringList('customers') ?? [];
+                                  final customerData = {
+                                    'gstin':
+                                        _customerGstinController.text.trim(),
+                                    'name': _customerNameController.text.trim(),
+                                    'address':
+                                        _customerAddressController.text.trim(),
+                                  };
+                                  final encoded = jsonEncode(customerData);
+                                  if (!customers.any(
+                                    (c) =>
+                                        jsonDecode(c)['gstin'] ==
+                                        customerData['gstin'],
+                                  )) {
+                                    customers.add(encoded);
+                                    await prefs.setStringList(
+                                      'customers',
+                                      customers,
+                                    );
+                                    await _loadCustomerSuggestions();
+                                  }
+                                  await _generatePdf();
+                                }
+                              },
                     ),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    textStyle: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      letterSpacing: 1.2,
-                    ),
-                    elevation: 4,
-                  ),
-                  icon:
-                      _isGenerating
-                          ? const SizedBox(
-                            width: 24,
-                            height: 24,
-                            child: CircularProgressIndicator(
-                              color: Colors.white,
-                              strokeWidth: 2.5,
-                            ),
-                          )
-                          : const Icon(Icons.picture_as_pdf, size: 24),
-                  label: Text(_isGenerating ? 'Generating...' : 'Generate PDF'),
-                  onPressed:
-                      _isGenerating
-                          ? null
-                          : () async {
-                            if (_formKey.currentState!.validate()) {
-                              final invalidChecked =
-                                  items
-                                      .where(
-                                        (item) =>
-                                            item.checked &&
-                                            (item.qty == 0 || item.rate == 0),
-                                      )
-                                      .toList();
-                              if (invalidChecked.isNotEmpty) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: Text(
-                                      'All selected items must have Quantity and Rate greater than 0.',
-                                    ),
-                                    backgroundColor: Colors.red,
-                                  ),
-                                );
-                                return;
-                              }
-                              final prefs =
-                                  await SharedPreferences.getInstance();
-                              final List<String> customers =
-                                  prefs.getStringList('customers') ?? [];
-                              final customerData = {
-                                'gstin': _customerGstinController.text.trim(),
-                                'name': _customerNameController.text.trim(),
-                                'address':
-                                    _customerAddressController.text.trim(),
-                              };
-                              final encoded = jsonEncode(customerData);
-                              if (!customers.any(
-                                (c) =>
-                                    jsonDecode(c)['gstin'] ==
-                                    customerData['gstin'],
-                              )) {
-                                customers.add(encoded);
-                                await prefs.setStringList(
-                                  'customers',
-                                  customers,
-                                );
-                                await _loadCustomerSuggestions();
-                              }
-                              await _generatePdf();
-                            }
-                          },
+                  ],
                 ),
                 const SizedBox(height: 20),
                 const Text('Add new item:', style: TextStyle(fontSize: 18)),
