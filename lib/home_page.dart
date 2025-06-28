@@ -767,17 +767,60 @@ class _HomePageState extends State<HomePage> {
                       ),
                       SizedBox(height: 16),
                       // Name
-                      TextFormField(
-                        controller: _customerNameController,
-                        decoration: InputDecoration(labelText: 'Name'),
-                        textCapitalization: TextCapitalization.characters,
-                        inputFormatters: [UpperCaseTextFormatter()],
-                        validator:
-                            (val) =>
-                                val == null || val.trim().isEmpty
-                                    ? 'Enter Name'
-                                    : null,
-                        onChanged: (val) => setState(() => _customerName = val),
+                      Autocomplete<Map<String, String>>(
+                        optionsBuilder: (TextEditingValue textEditingValue) {
+                          if (textEditingValue.text.isEmpty) {
+                            return const Iterable<Map<String, String>>.empty();
+                          }
+                          return _customerSuggestions.where(
+                            (customer) =>
+                                customer['name']!.toUpperCase().startsWith(
+                                  textEditingValue.text.toUpperCase(),
+                                ),
+                          );
+                        },
+                        displayStringForOption: (option) => option['name']!,
+                        fieldViewBuilder: (
+                          context,
+                          controller,
+                          focusNode,
+                          onFieldSubmitted,
+                        ) {
+                          _customerNameController.text = controller.text;
+                          return TextFormField(
+                            controller: controller,
+                            focusNode: focusNode,
+                            decoration: const InputDecoration(
+                              labelText: 'Name',
+                            ),
+                            textCapitalization: TextCapitalization.characters,
+                            inputFormatters: [UpperCaseTextFormatter()],
+                            validator:
+                                (val) =>
+                                    val == null || val.trim().isEmpty
+                                        ? 'Enter Name'
+                                        : null,
+                            onChanged:
+                                (val) => setState(() => _customerName = val),
+                          );
+                        },
+                        onSelected: (Map<String, String> selection) {
+                          _customerNameController.text = selection['name']!;
+                          _customerGstinController.text = selection['gstin']!;
+                          _customerGstinController
+                              .selection = TextSelection.fromPosition(
+                            TextPosition(
+                              offset: _customerGstinController.text.length,
+                            ),
+                          );
+                          _customerAddressController.text =
+                              selection['address']!;
+                          setState(() {
+                            _customerName = selection['name']!;
+                            _customerGstin = selection['gstin']!;
+                            _customerAddress = selection['address']!;
+                          });
+                        },
                       ),
                       SizedBox(height: 8),
                       // Address
@@ -802,6 +845,7 @@ class _HomePageState extends State<HomePage> {
                       SizedBox(height: 8),
                       // GSTIN
                       Autocomplete<Map<String, String>>(
+                        key: Key(_customerGstinController.text),
                         optionsBuilder: (TextEditingValue textEditingValue) {
                           if (textEditingValue.text.isEmpty) {
                             return const Iterable<Map<String, String>>.empty();
@@ -816,13 +860,12 @@ class _HomePageState extends State<HomePage> {
                         displayStringForOption: (option) => option['gstin']!,
                         fieldViewBuilder: (
                           context,
-                          controller,
+                          _,
                           focusNode,
                           onFieldSubmitted,
                         ) {
-                          _customerGstinController.text = controller.text;
                           return TextFormField(
-                            controller: controller,
+                            controller: _customerGstinController,
                             focusNode: focusNode,
                             decoration: const InputDecoration(
                               labelText: 'GSTIN',
