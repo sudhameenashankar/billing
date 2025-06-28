@@ -1,3 +1,5 @@
+import 'package:flutter/services.dart';
+
 bool isValidGstin(String gstin) {
   final gstinRegex = RegExp(
     r'^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$',
@@ -15,4 +17,17 @@ String toPascalCase(String input) {
                 : word[0].toUpperCase() + word.substring(1).toLowerCase(),
       )
       .join(' ');
+}
+
+class UpperCaseTextFormatter extends TextInputFormatter {
+  @override
+  TextEditingValue formatEditUpdate(
+    TextEditingValue oldValue,
+    TextEditingValue newValue,
+  ) {
+    return TextEditingValue(
+      text: newValue.text.toUpperCase(),
+      selection: newValue.selection,
+    );
+  }
 }
