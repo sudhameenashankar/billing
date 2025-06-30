@@ -29,7 +29,7 @@ class _HomePageState extends State<HomePage> {
   final _rateController = TextEditingController();
 
   String _invoiceNumber = '';
-  final DateTime _invoiceDate = DateTime.now();
+  DateTime _invoiceDate = DateTime.now();
   final _invoiceNumberController = TextEditingController();
 
   final _customerNameController = TextEditingController();
@@ -48,6 +48,7 @@ class _HomePageState extends State<HomePage> {
   List<Map<String, String>> _customerSuggestions = [];
   bool _isGenerating = false;
   String _lastInvoiceNumber = '';
+  final TextEditingController _dateController = TextEditingController();
 
   @override
   void initState() {
@@ -767,6 +768,37 @@ class _HomePageState extends State<HomePage> {
                         ],
                       ),
                       SizedBox(height: 16),
+                      // Invoice Date
+                      TextFormField(
+                        controller: _dateController,
+                        readOnly: true,
+                        decoration: const InputDecoration(
+                          labelText: 'Invoice Date',
+                          suffixIcon: Icon(Icons.calendar_today),
+                        ),
+                        validator:
+                            (val) =>
+                                val == null || val.isEmpty
+                                    ? 'Select Invoice Date'
+                                    : null,
+                        onTap: () async {
+                          FocusScope.of(context).requestFocus(FocusNode());
+                          final picked = await showDatePicker(
+                            context: context,
+                            initialDate: _invoiceDate,
+                            firstDate: DateTime(2000),
+                            lastDate: DateTime(2100),
+                          );
+                          if (picked != null) {
+                            setState(() {
+                              _invoiceDate = picked;
+                              _dateController.text =
+                                  "${picked.day.toString().padLeft(2, '0')}/${picked.month.toString().padLeft(2, '0')}/${picked.year}";
+                            });
+                          }
+                        },
+                      ),
+                      SizedBox(height: 16),
                       // Name
                       Autocomplete<Map<String, String>>(
                         optionsBuilder: (TextEditingValue textEditingValue) {
@@ -868,8 +900,7 @@ class _HomePageState extends State<HomePage> {
                         onChanged:
                             (val) => setState(() => _customerGstin = val),
                       ),
-                      SizedBox(height: 16),
-                      // ...rest of your widgets...
+                      SizedBox(height: 12),
                     ],
                   ),
                 ),
