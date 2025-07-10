@@ -999,18 +999,25 @@ class _HomePageState extends State<HomePage> {
                                         _customerAddressController.text.trim(),
                                   };
                                   final encoded = jsonEncode(customerData);
-                                  if (!customers.any(
-                                    (c) =>
-                                        jsonDecode(c)['gstin'] ==
-                                        customerData['gstin'],
-                                  )) {
-                                    customers.add(encoded);
-                                    await prefs.setStringList(
-                                      'customers',
-                                      customers,
-                                    );
-                                    await _loadCustomerSuggestions();
+                                  bool updated = false;
+                                  for (int i = 0; i < customers.length; i++) {
+                                    final c = jsonDecode(customers[i]);
+                                    if (c['gstin'] == customerData['gstin']) {
+                                      customers[i] = encoded; // Update existing
+                                      updated = true;
+                                      break;
+                                    }
                                   }
+                                  if (!updated) {
+                                    customers.add(
+                                      encoded,
+                                    ); // Add new if not found
+                                  }
+                                  await prefs.setStringList(
+                                    'customers',
+                                    customers,
+                                  );
+                                  await _loadCustomerSuggestions();
                                   await _generatePdf();
                                 }
                               },
