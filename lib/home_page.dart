@@ -50,6 +50,47 @@ class _HomePageState extends State<HomePage> {
   String _lastInvoiceNumber = '';
   final TextEditingController _dateController = TextEditingController();
 
+  static const Map<String, String> gstStateCodes = {
+    "01": "Jammu & Kashmir",
+    "02": "Himachal Pradesh",
+    "03": "Punjab",
+    "04": "Chandigarh",
+    "05": "Uttarakhand",
+    "06": "Haryana",
+    "07": "Delhi",
+    "08": "Rajasthan",
+    "09": "Uttar Pradesh",
+    "10": "Bihar",
+    "11": "Sikkim",
+    "12": "Arunachal Pradesh",
+    "13": "Nagaland",
+    "14": "Manipur",
+    "15": "Mizoram",
+    "16": "Tripura",
+    "17": "Meghalaya",
+    "18": "Assam",
+    "19": "West Bengal",
+    "20": "Jharkhand",
+    "21": "Odisha",
+    "22": "Chhattisgarh",
+    "23": "Madhya Pradesh",
+    "24": "Gujarat",
+    "25": "Daman & Diu",
+    "26": "Dadra & Nagar Haveli",
+    "27": "Maharashtra",
+    "28": "Andhra Pradesh (Old)",
+    "29": "Karnataka",
+    "30": "Goa",
+    "31": "Lakshadweep",
+    "32": "Kerala",
+    "33": "Tamil Nadu",
+    "34": "Puducherry",
+    "35": "Andaman & Nicobar Islands",
+    "36": "Telangana",
+    "37": "Andhra Pradesh",
+    "97": "Other Territory",
+  };
+
   @override
   void initState() {
     super.initState();
@@ -144,6 +185,11 @@ class _HomePageState extends State<HomePage> {
       final netAmountWords =
           '${toPascalCase(NumberToWord().convert('en-in', netAmount.round()))} Rupees Only';
 
+      // Extract state code and state name from GSTIN
+      String gstin = _customerGstinController.text.trim();
+      String stateCode = gstin.length >= 2 ? gstin.substring(0, 2) : '';
+      String stateName = gstStateCodes[stateCode] ?? '';
+
       pdf.addPage(
         pw.Page(
           margin: pw.EdgeInsets.all(16),
@@ -233,7 +279,7 @@ class _HomePageState extends State<HomePage> {
                                   pw.Divider(thickness: 1),
                                   pw.Row(
                                     children: [
-                                      pw.Text("State : Tamil Nadu"),
+                                      pw.Text("State : $stateName"),
                                       pw.Container(
                                         width: 1,
                                         height: 14,
@@ -242,7 +288,7 @@ class _HomePageState extends State<HomePage> {
                                           horizontal: 8,
                                         ),
                                       ),
-                                      pw.Text("State Code : 33"),
+                                      pw.Text("State Code : $stateCode"),
                                     ],
                                   ),
                                   pw.Divider(thickness: 1),
@@ -339,7 +385,7 @@ class _HomePageState extends State<HomePage> {
                                   pw.Row(
                                     children: [
                                       pw.Expanded(
-                                        child: pw.Text('State: TAMIL NADU'),
+                                        child: pw.Text('State: $stateName'),
                                       ),
                                       pw.Container(
                                         width: 1,
@@ -350,7 +396,9 @@ class _HomePageState extends State<HomePage> {
                                         ),
                                       ),
                                       pw.Expanded(
-                                        child: pw.Text('State Code: 33'),
+                                        child: pw.Text(
+                                          'State Code: $stateCode',
+                                        ),
                                       ),
                                     ],
                                   ),
