@@ -279,7 +279,7 @@ class _HomePageState extends State<HomePage> {
                                   pw.Divider(thickness: 1),
                                   pw.Row(
                                     children: [
-                                      pw.Text("State : $stateName"),
+                                      pw.Text("State : Tamil Nadu"),
                                       pw.Container(
                                         width: 1,
                                         height: 14,
@@ -288,7 +288,7 @@ class _HomePageState extends State<HomePage> {
                                           horizontal: 8,
                                         ),
                                       ),
-                                      pw.Text("State Code : $stateCode"),
+                                      pw.Text("State Code : 33"),
                                     ],
                                   ),
                                   pw.Divider(thickness: 1),
