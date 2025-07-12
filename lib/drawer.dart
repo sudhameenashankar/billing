@@ -37,7 +37,7 @@ class InvoiceDrawer extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  'Billing App',
+                  'Ramasamy Textiles',
                   style: TextStyle(
                     color: Colors.white.withValues(),
                     fontSize: 14,
