@@ -84,6 +84,7 @@ class _ContactsPageState extends State<ContactsPage> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
+          // Move controllers and formKey outside the builder
           final formKey = GlobalKey<FormState>();
           final nameController = TextEditingController();
           final addressController = TextEditingController();
@@ -91,158 +92,153 @@ class _ContactsPageState extends State<ContactsPage> {
           final width = MediaQuery.of(context).size.width * 0.95;
           final added = await showDialog<Map<String, String>>(
             context: context,
-            builder:
-                (context) => Dialog(
-                  insetPadding: const EdgeInsets.symmetric(
-                    horizontal: 8,
-                    vertical: 24,
-                  ),
-                  child: Container(
-                    width: width,
-                    padding: const EdgeInsets.all(16),
-                    child: SingleChildScrollView(
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Text(
-                            'Add Contact',
-                            style: TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                            ),
+            builder: (context) {
+              return Dialog(
+                insetPadding: const EdgeInsets.symmetric(
+                  horizontal: 8,
+                  vertical: 24,
+                ),
+                child: Container(
+                  width: width,
+                  padding: const EdgeInsets.all(16),
+                  child: SingleChildScrollView(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          'Add Contact',
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
                           ),
-                          const SizedBox(height: 16),
-                          Form(
-                            key: formKey,
-                            child: Column(
-                              children: [
-                                TextFormField(
-                                  controller: nameController,
-                                  decoration: const InputDecoration(
-                                    labelText: 'Name',
-                                  ),
-                                  textCapitalization:
-                                      TextCapitalization.characters,
-                                  inputFormatters: [UpperCaseTextFormatter()],
-                                  validator:
-                                      (val) =>
-                                          val == null || val.trim().isEmpty
-                                              ? 'Enter Name'
-                                              : null,
+                        ),
+                        const SizedBox(height: 16),
+                        Form(
+                          key: formKey,
+                          child: Column(
+                            children: [
+                              TextFormField(
+                                controller: nameController,
+                                decoration: const InputDecoration(
+                                  labelText: 'Name',
                                 ),
-                                TextFormField(
-                                  controller: addressController,
-                                  decoration: const InputDecoration(
-                                    labelText: 'Address',
-                                  ),
-                                  textCapitalization:
-                                      TextCapitalization.characters,
-                                  inputFormatters: [UpperCaseTextFormatter()],
-                                  minLines: 3,
-                                  maxLines: 6,
+                                textCapitalization:
+                                    TextCapitalization.characters,
+                                inputFormatters: [UpperCaseTextFormatter()],
+                                validator:
+                                    (val) =>
+                                        val == null || val.trim().isEmpty
+                                            ? 'Enter Name'
+                                            : null,
+                              ),
+                              TextFormField(
+                                controller: addressController,
+                                decoration: const InputDecoration(
+                                  labelText: 'Address',
                                 ),
-                                Row(
-                                  children: [
-                                    Expanded(
-                                      child: TextFormField(
-                                        controller: gstinController,
-                                        decoration: const InputDecoration(
-                                          labelText: 'GSTIN',
-                                        ),
-                                        textCapitalization:
-                                            TextCapitalization.characters,
-                                        inputFormatters: [
-                                          UpperCaseTextFormatter(),
-                                        ],
-                                        validator: (val) {
-                                          if (val == null ||
-                                              val.trim().isEmpty) {
-                                            return null;
-                                          }
-                                          final gstinRegex = RegExp(
-                                            r'^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}?$',
-                                          );
-                                          if (!gstinRegex.hasMatch(
-                                            val.trim(),
-                                          )) {
-                                            return 'Enter valid GSTIN';
-                                          }
+                                textCapitalization:
+                                    TextCapitalization.characters,
+                                inputFormatters: [UpperCaseTextFormatter()],
+                                minLines: 3,
+                                maxLines: 6,
+                              ),
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: TextFormField(
+                                      controller: gstinController,
+                                      decoration: const InputDecoration(
+                                        labelText: 'GSTIN',
+                                      ),
+                                      textCapitalization:
+                                          TextCapitalization.characters,
+                                      inputFormatters: [
+                                        UpperCaseTextFormatter(),
+                                      ],
+                                      validator: (val) {
+                                        if (val == null || val.trim().isEmpty) {
                                           return null;
-                                        },
-                                      ),
-                                    ),
-                                    IconButton(
-                                      icon: const Icon(
-                                        Icons.qr_code_scanner,
-                                        color: Colors.deepPurple,
-                                      ),
-                                      tooltip: 'Scan GSTIN',
-                                      onPressed: () async {
-                                        final source =
-                                            await showImageSourceDialog(
-                                              context,
-                                            );
-                                        if (source != null) {
-                                          final gstin =
-                                              await scanGstinFromImage(
-                                                context,
-                                                source,
-                                              );
-                                          if (gstin != null) {
-                                            gstinController.text = gstin;
-                                            scaffoldMessenger.showSnackBar(
-                                              SnackBar(
-                                                content: Text(
-                                                  'GSTIN detected: $gstin',
-                                                ),
-                                              ),
-                                            );
-                                          } else {
-                                            scaffoldMessenger.showSnackBar(
-                                              const SnackBar(
-                                                content: Text(
-                                                  'No valid GSTIN found.',
-                                                ),
-                                              ),
-                                            );
-                                          }
                                         }
+                                        final gstinRegex = RegExp(
+                                          r'^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}?$',
+                                        );
+                                        if (!gstinRegex.hasMatch(val.trim())) {
+                                          return 'Enter valid GSTIN';
+                                        }
+                                        return null;
                                       },
                                     ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                          ),
-                          const SizedBox(height: 24),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            children: [
-                              TextButton(
-                                onPressed: () => Navigator.pop(context),
-                                child: const Text('Cancel'),
-                              ),
-                              const SizedBox(width: 12),
-                              TextButton(
-                                onPressed: () {
-                                  if (formKey.currentState!.validate()) {
-                                    Navigator.pop(context, {
-                                      'name': nameController.text.trim(),
-                                      'address': addressController.text.trim(),
-                                      'gstin': gstinController.text.trim(),
-                                    });
-                                  }
-                                },
-                                child: const Text('Save'),
+                                  ),
+                                  IconButton(
+                                    icon: const Icon(
+                                      Icons.qr_code_scanner,
+                                      color: Colors.deepPurple,
+                                    ),
+                                    tooltip: 'Scan GSTIN',
+                                    onPressed: () async {
+                                      final source =
+                                          await showImageSourceDialog(context);
+                                      if (source != null) {
+                                        final gstin = await scanGstinFromImage(
+                                          context,
+                                          source,
+                                        );
+                                        if (gstin != null) {
+                                          gstinController.text = gstin;
+                                          scaffoldMessenger.showSnackBar(
+                                            SnackBar(
+                                              content: Text(
+                                                'GSTIN detected: $gstin',
+                                              ),
+                                            ),
+                                          );
+                                        } else {
+                                          scaffoldMessenger.showSnackBar(
+                                            const SnackBar(
+                                              content: Text(
+                                                'No valid GSTIN found.',
+                                              ),
+                                            ),
+                                          );
+                                        }
+                                      }
+                                    },
+                                  ),
+                                ],
                               ),
                             ],
                           ),
-                        ],
-                      ),
+                        ),
+                        const SizedBox(height: 24),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            TextButton(
+                              onPressed: () => Navigator.pop(context),
+                              child: const Text('Cancel'),
+                            ),
+                            const SizedBox(width: 12),
+                            TextButton(
+                              onPressed: () {
+                                if (formKey.currentState!.validate()) {
+                                  Navigator.pop(context, {
+                                    'name': nameController.text.trim(),
+                                    'address': addressController.text.trim(),
+                                    'gstin': gstinController.text.trim(),
+                                  });
+                                }
+                              },
+                              child: const Text('Save'),
+                            ),
+                          ],
+                        ),
+                      ],
                     ),
                   ),
                 ),
+              );
+            },
           );
           if (added != null) {
             setState(() {
@@ -367,21 +363,21 @@ class _ContactsPageState extends State<ContactsPage> {
                     icon: const Icon(Icons.edit, color: Colors.blue),
                     tooltip: 'Edit',
                     onPressed: () async {
+                      // Move controllers and formKey outside the builder
+                      final formKey = GlobalKey<FormState>();
+                      final nameController = TextEditingController(
+                        text: c['name'] ?? '',
+                      );
+                      final addressController = TextEditingController(
+                        text: c['address'] ?? '',
+                      );
+                      final gstinController = TextEditingController(
+                        text: c['gstin'] ?? '',
+                      );
+                      final width = MediaQuery.of(context).size.width * 0.95;
                       final edited = await showDialog<Map<String, String>>(
                         context: context,
                         builder: (context) {
-                          final formKey = GlobalKey<FormState>();
-                          final nameController = TextEditingController(
-                            text: c['name'] ?? '',
-                          );
-                          final addressController = TextEditingController(
-                            text: c['address'] ?? '',
-                          );
-                          final gstinController = TextEditingController(
-                            text: c['gstin'] ?? '',
-                          );
-                          final width =
-                              MediaQuery.of(context).size.width * 0.95;
                           return Dialog(
                             insetPadding: const EdgeInsets.symmetric(
                               horizontal: 8,
