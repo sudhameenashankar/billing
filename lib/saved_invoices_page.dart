@@ -60,10 +60,38 @@ class _SavedInvoicesPageState extends State<SavedInvoicesPage> {
                 trailing: IconButton(
                   icon: const Icon(Icons.delete, color: Colors.red),
                   onPressed: () async {
-                    invoices.removeAt(index);
-                    final updated = invoices.map((e) => jsonEncode(e)).toList();
-                    await prefs.setStringList('saved_invoices', updated);
-                    setState(() {});
+                    final confirm = await showDialog<bool>(
+                      context: context,
+                      builder:
+                          (context) => AlertDialog(
+                            title: const Text('Delete Invoice'),
+                            content: const Text(
+                              'Are you sure you want to delete this invoice?',
+                            ),
+                            actions: [
+                              TextButton(
+                                onPressed:
+                                    () => Navigator.of(context).pop(false),
+                                child: const Text('Cancel'),
+                              ),
+                              TextButton(
+                                onPressed:
+                                    () => Navigator.of(context).pop(true),
+                                child: const Text(
+                                  'Delete',
+                                  style: TextStyle(color: Colors.red),
+                                ),
+                              ),
+                            ],
+                          ),
+                    );
+                    if (confirm == true) {
+                      invoices.removeAt(index);
+                      final updated =
+                          invoices.map((e) => jsonEncode(e)).toList();
+                      await prefs.setStringList('saved_invoices', updated);
+                      setState(() {});
+                    }
                   },
                 ),
                 onTap: () {
