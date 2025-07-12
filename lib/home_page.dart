@@ -1,3 +1,4 @@
+import 'package:billing/dialogs.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:number_to_words/number_to_words.dart';
@@ -24,42 +25,47 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  Future<void> _scanGstinFromCamera() async {
+  Future<void> _scanGstin() async {
     final picker = ImagePicker();
-    final pickedFile = await picker.pickImage(source: ImageSource.camera);
-    if (pickedFile == null) return;
-    final inputImage = InputImage.fromFilePath(pickedFile.path);
-    final textRecognizer = TextRecognizer(script: TextRecognitionScript.latin);
-    final RecognizedText recognizedText = await textRecognizer.processImage(
-      inputImage,
-    );
-    final gstinRegex = RegExp(
-      r'\b[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}\b',
-    );
-    String? foundGstin;
-    for (final block in recognizedText.blocks) {
-      for (final line in block.lines) {
-        final match = gstinRegex.firstMatch(line.text.replaceAll(' ', ''));
-        if (match != null) {
-          foundGstin = match.group(0);
-          break;
+    final source = await showImageSourceDialog(context);
+    if (source != null) {
+      final pickedFile = await picker.pickImage(source: source);
+      if (pickedFile == null) return;
+      final inputImage = InputImage.fromFilePath(pickedFile.path);
+      final textRecognizer = TextRecognizer(
+        script: TextRecognitionScript.latin,
+      );
+      final RecognizedText recognizedText = await textRecognizer.processImage(
+        inputImage,
+      );
+      final gstinRegex = RegExp(
+        r'\b[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}\b',
+      );
+      String? foundGstin;
+      for (final block in recognizedText.blocks) {
+        for (final line in block.lines) {
+          final match = gstinRegex.firstMatch(line.text.replaceAll(' ', ''));
+          if (match != null) {
+            foundGstin = match.group(0);
+            break;
+          }
         }
+        if (foundGstin != null) break;
       }
-      if (foundGstin != null) break;
-    }
-    await textRecognizer.close();
-    if (foundGstin != null) {
-      setState(() {
-        _customerGstinController.text = foundGstin!;
-        _customerGstin = foundGstin;
-      });
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('GSTIN detected: ' + foundGstin)));
-    } else {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('No valid GSTIN found.')));
+      await textRecognizer.close();
+      if (foundGstin != null) {
+        setState(() {
+          _customerGstinController.text = foundGstin!;
+          _customerGstin = foundGstin;
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('GSTIN detected: ' + foundGstin)),
+        );
+      } else {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('No valid GSTIN found.')));
+      }
     }
   }
 
@@ -808,7 +814,7 @@ class _HomePageState extends State<HomePage> {
           IconButton(
             icon: const Icon(Icons.qr_code_scanner),
             tooltip: 'Scan GSTIN',
-            onPressed: _scanGstinFromCamera,
+            onPressed: _scanGstin,
           ),
         ],
       ),
