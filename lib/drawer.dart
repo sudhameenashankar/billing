@@ -1,3 +1,4 @@
+import 'package:billing/pages/contacts_page.dart';
 import 'package:flutter/material.dart';
 import 'package:billing/saved_invoices_page.dart';
 
@@ -38,7 +39,7 @@ class InvoiceDrawer extends StatelessWidget {
                 Text(
                   'Billing App',
                   style: TextStyle(
-                    color: Colors.white.withOpacity(0.85),
+                    color: Colors.white.withValues(),
                     fontSize: 14,
                   ),
                 ),
@@ -56,6 +57,21 @@ class InvoiceDrawer extends StatelessWidget {
               Navigator.push(
                 context,
                 MaterialPageRoute(builder: (_) => const SavedInvoicesPage()),
+              );
+            },
+          ),
+
+          ListTile(
+            leading: Icon(
+              Icons.contacts,
+              color: Theme.of(context).colorScheme.primary,
+            ),
+            title: const Text('Contacts'),
+            onTap: () {
+              Navigator.pop(context);
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const ContactsPage()),
               );
             },
           ),
