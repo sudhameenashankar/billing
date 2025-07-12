@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:billing/general_utility.dart';
+import 'package:billing/utility/general_utility.dart';
 import 'package:flutter/material.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:file_picker/file_picker.dart';

@@ -4,7 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:number_to_words/number_to_words.dart';
 import 'package:billing/item_model.dart';
 import 'package:billing/drawer.dart';
-import 'package:billing/general_utility.dart';
+import 'package:billing/utility/general_utility.dart';
 import 'package:billing/pdf_preview_page.dart';
 import 'dart:io';
 import 'package:path_provider/path_provider.dart';
