@@ -1,3 +1,5 @@
+import 'package:billing/pages/contacts_page.dart';
+import 'package:billing/services/shared_json_handler.dart';
 import 'package:billing/dialogs.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -25,7 +27,25 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  @override
+  void initState() {
+    super.initState();
+    _loadItems();
+    _loadCustomerSuggestions();
+    _loadLastInvoiceNumber();
+    SharedJsonHandler.startListening(context, _onContactsImported);
+  }
+
+  void _onContactsImported() {
+    Navigator.of(
+      context,
+    ).push(MaterialPageRoute(builder: (_) => const ContactsPage()));
+  }
+
   Future<void> _scanGstin() async {
+    final ScaffoldMessengerState scaffoldMessengerState = ScaffoldMessenger.of(
+      context,
+    );
     final picker = ImagePicker();
     final source = await showImageSourceDialog(context);
     if (source != null) {
@@ -58,13 +78,13 @@ class _HomePageState extends State<HomePage> {
           _customerGstinController.text = foundGstin!;
           _customerGstin = foundGstin;
         });
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('GSTIN detected: ' + foundGstin)),
+        scaffoldMessengerState.showSnackBar(
+          SnackBar(content: Text('GSTIN detected: $foundGstin')),
         );
       } else {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(const SnackBar(content: Text('No valid GSTIN found.')));
+        scaffoldMessengerState.showSnackBar(
+          const SnackBar(content: Text('No valid GSTIN found.')),
+        );
       }
     }
   }
@@ -137,14 +157,6 @@ class _HomePageState extends State<HomePage> {
     "37": "Andhra Pradesh",
     "97": "Other Territory",
   };
-
-  @override
-  void initState() {
-    super.initState();
-    _loadItems();
-    _loadCustomerSuggestions();
-    _loadLastInvoiceNumber();
-  }
 
   Future<void> _loadItems() async {
     final prefs = await SharedPreferences.getInstance();

@@ -16,10 +16,12 @@ class ContactsService {
     await prefs.setStringList(_key, list);
   }
 
-  static Future<void> mergeContacts(List<Map<String, String>> newContacts) async {
+  static Future<void> mergeContacts(
+    List<Map<String, String>> newContacts,
+  ) async {
     final existing = await loadContacts();
     final Map<String, Map<String, String>> merged = {
-      for (var c in existing) c['gstin']!: c
+      for (var c in existing) c['gstin']!: c,
     };
     for (var c in newContacts) {
       merged[c['gstin']!] = c;
