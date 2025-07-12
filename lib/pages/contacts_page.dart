@@ -82,28 +82,28 @@ class _ContactsPageState extends State<ContactsPage> {
         itemBuilder: (context, i) {
           final c = _contacts[i];
           return Card(
-            margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-            elevation: 4,
+            margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+            elevation: 6,
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(14),
+              borderRadius: BorderRadius.circular(18),
             ),
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 22),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   CircleAvatar(
-                    radius: 24,
+                    radius: 30,
                     backgroundColor: Theme.of(
                       context,
-                    ).colorScheme.primary.withOpacity(0.1),
+                    ).colorScheme.primary.withOpacity(0.12),
                     child: Icon(
                       Icons.store,
                       color: Theme.of(context).colorScheme.primary,
-                      size: 28,
+                      size: 34,
                     ),
                   ),
-                  const SizedBox(width: 14),
+                  const SizedBox(width: 18),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -112,15 +112,18 @@ class _ContactsPageState extends State<ContactsPage> {
                           children: [
                             Icon(
                               Icons.person,
-                              size: 18,
+                              size: 20,
                               color: Theme.of(context).colorScheme.primary,
                             ),
-                            const SizedBox(width: 6),
-                            Text(
-                              c['name'] ?? '',
-                              style: const TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 16,
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: Text(
+                                c['name'] ?? '',
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 18,
+                                ),
+                                overflow: TextOverflow.ellipsis,
                               ),
                             ),
                           ],
@@ -128,22 +131,22 @@ class _ContactsPageState extends State<ContactsPage> {
                         if ((c['shopName'] ?? '').isNotEmpty)
                           Padding(
                             padding: const EdgeInsets.only(
-                              top: 4.0,
+                              top: 6.0,
                               bottom: 2.0,
                             ),
                             child: Row(
                               children: [
                                 Icon(
                                   Icons.storefront,
-                                  size: 16,
+                                  size: 18,
                                   color: Colors.deepPurple,
                                 ),
-                                const SizedBox(width: 6),
-                                Flexible(
+                                const SizedBox(width: 8),
+                                Expanded(
                                   child: Text(
                                     c['shopName'] ?? '',
                                     style: const TextStyle(
-                                      fontSize: 14,
+                                      fontSize: 16,
                                       fontWeight: FontWeight.w500,
                                     ),
                                     overflow: TextOverflow.ellipsis,
@@ -155,7 +158,7 @@ class _ContactsPageState extends State<ContactsPage> {
                         if ((c['address'] ?? '').isNotEmpty)
                           Padding(
                             padding: const EdgeInsets.only(
-                              top: 2.0,
+                              top: 4.0,
                               bottom: 2.0,
                             ),
                             child: Row(
@@ -163,16 +166,16 @@ class _ContactsPageState extends State<ContactsPage> {
                               children: [
                                 Icon(
                                   Icons.location_on,
-                                  size: 16,
+                                  size: 18,
                                   color: Colors.teal,
                                 ),
-                                const SizedBox(width: 6),
-                                Flexible(
+                                const SizedBox(width: 8),
+                                Expanded(
                                   child: Text(
                                     c['address'] ?? '',
-                                    style: const TextStyle(fontSize: 14),
+                                    style: const TextStyle(fontSize: 15),
                                     overflow: TextOverflow.ellipsis,
-                                    maxLines: 2,
+                                    maxLines: 3,
                                   ),
                                 ),
                               ],
@@ -181,22 +184,22 @@ class _ContactsPageState extends State<ContactsPage> {
                         if ((c['gstin'] ?? '').isNotEmpty)
                           Padding(
                             padding: const EdgeInsets.only(
-                              top: 2.0,
+                              top: 4.0,
                               bottom: 2.0,
                             ),
                             child: Row(
                               children: [
                                 Icon(
                                   Icons.confirmation_number,
-                                  size: 16,
+                                  size: 18,
                                   color: Colors.orange,
                                 ),
-                                const SizedBox(width: 6),
-                                Flexible(
+                                const SizedBox(width: 8),
+                                Expanded(
                                   child: Text(
                                     c['gstin'] ?? '',
                                     style: const TextStyle(
-                                      fontSize: 14,
+                                      fontSize: 15,
                                       color: Colors.grey,
                                     ),
                                     overflow: TextOverflow.ellipsis,
@@ -217,7 +220,7 @@ class _ContactsPageState extends State<ContactsPage> {
                         builder:
                             (context) => AlertDialog(
                               title: const Text('Delete Contact'),
-                              content: Text(
+                              content: const Text(
                                 'Are you sure you want to delete this contact?',
                               ),
                               actions: [

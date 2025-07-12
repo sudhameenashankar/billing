@@ -154,7 +154,16 @@ class _HomePageState extends State<HomePage> {
 
   Future<File> _savePdfToFile(pw.Document pdf) async {
     final output = await getTemporaryDirectory();
-    final file = File('${output.path}/invoice.pdf');
+    // Use invoice number and current date-time for unique filename
+    final now = DateTime.now();
+    final dateTimeStr =
+        "${now.year}${now.month.toString().padLeft(2, '0')}${now.day.toString().padLeft(2, '0')}_${now.hour.toString().padLeft(2, '0')}${now.minute.toString().padLeft(2, '0')}${now.second.toString().padLeft(2, '0')}";
+    final invoiceNum = _invoiceNumberController.text.trim().replaceAll(
+      RegExp(r'[^\w\d]+'),
+      '_',
+    );
+    final fileName = "invoice_${invoiceNum}_$dateTimeStr.pdf";
+    final file = File('${output.path}/$fileName');
     await file.writeAsBytes(await pdf.save());
     return file;
   }
@@ -162,7 +171,6 @@ class _HomePageState extends State<HomePage> {
   Future<void> _generatePdf() async {
     setState(() => _isGenerating = true);
     try {
-      await _saveLastInvoiceNumber(_invoiceNumberController.text.trim());
       final pdf = pw.Document();
       // Only include checked items with qty > 0 and rate > 0
       final selected =
@@ -721,7 +729,7 @@ class _HomePageState extends State<HomePage> {
       );
 
       final file = await _savePdfToFile(pdf);
-
+      _saveLastInvoiceNumber(_invoiceNumberController.text);
       if (mounted) {
         Navigator.push(
           context,
