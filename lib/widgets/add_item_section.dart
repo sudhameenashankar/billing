@@ -1,4 +1,4 @@
-import 'package:billing/general_utility.dart';
+import 'package:billing/utility/general_utility.dart';
 import 'package:flutter/material.dart';
 
 class AddItemSection extends StatelessWidget {

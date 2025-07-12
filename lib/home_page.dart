@@ -1,15 +1,18 @@
+import 'package:billing/dialogs.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:number_to_words/number_to_words.dart';
 import 'package:billing/item_model.dart';
 import 'package:billing/drawer.dart';
-import 'package:billing/general_utility.dart';
+import 'package:billing/utility/general_utility.dart';
 import 'package:billing/pdf_preview_page.dart';
 import 'dart:io';
 import 'package:path_provider/path_provider.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'dart:convert';
 import 'package:pdf/pdf.dart';
+import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:billing/widgets/items_list_section.dart';
 import 'package:billing/widgets/add_item_section.dart';
 
@@ -22,6 +25,50 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  Future<void> _scanGstin() async {
+    final picker = ImagePicker();
+    final source = await showImageSourceDialog(context);
+    if (source != null) {
+      final pickedFile = await picker.pickImage(source: source);
+      if (pickedFile == null) return;
+      final inputImage = InputImage.fromFilePath(pickedFile.path);
+      final textRecognizer = TextRecognizer(
+        script: TextRecognitionScript.latin,
+      );
+      final RecognizedText recognizedText = await textRecognizer.processImage(
+        inputImage,
+      );
+      final gstinRegex = RegExp(
+        r'\b[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}\b',
+      );
+      String? foundGstin;
+      for (final block in recognizedText.blocks) {
+        for (final line in block.lines) {
+          final match = gstinRegex.firstMatch(line.text.replaceAll(' ', ''));
+          if (match != null) {
+            foundGstin = match.group(0);
+            break;
+          }
+        }
+        if (foundGstin != null) break;
+      }
+      await textRecognizer.close();
+      if (foundGstin != null) {
+        setState(() {
+          _customerGstinController.text = foundGstin!;
+          _customerGstin = foundGstin;
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('GSTIN detected: ' + foundGstin)),
+        );
+      } else {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('No valid GSTIN found.')));
+      }
+    }
+  }
+
   List<InvoiceItem> items = [];
 
   final _nameController = TextEditingController();
@@ -763,6 +810,13 @@ class _HomePageState extends State<HomePage> {
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         title: Text(widget.title),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.qr_code_scanner),
+            tooltip: 'Scan GSTIN',
+            onPressed: _scanGstin,
+          ),
+        ],
       ),
       drawer: InvoiceDrawer(),
       body: SafeArea(
