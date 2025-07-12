@@ -1,71 +1,81 @@
+import 'package:billing/pages/contacts_page.dart';
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:billing/pdf_preview_page.dart';
-import 'dart:io';
-import 'dart:convert';
+import 'package:billing/saved_invoices_page.dart';
 
-class InvoiceDrawer extends StatefulWidget {
+class InvoiceDrawer extends StatelessWidget {
   const InvoiceDrawer({super.key});
-
-  @override
-  State<InvoiceDrawer> createState() => _InvoiceDrawerState();
-}
-
-class _InvoiceDrawerState extends State<InvoiceDrawer> {
-  late Future<SharedPreferences> _prefsFuture;
-
-  @override
-  void initState() {
-    super.initState();
-    _prefsFuture = SharedPreferences.getInstance();
-  }
 
   @override
   Widget build(BuildContext context) {
     return Drawer(
-      child: FutureBuilder(
-        future: _prefsFuture,
-        builder: (context, snapshot) {
-          if (!snapshot.hasData) {
-            return const Center(child: CircularProgressIndicator());
-          }
-          final prefs = snapshot.data as SharedPreferences;
-          final List<String> savedInvoices =
-              prefs.getStringList('saved_invoices') ?? [];
-          final invoices =
-              savedInvoices.map((e) {
-                final map = jsonDecode(e) as Map<String, dynamic>;
-                return map;
-              }).toList();
-          return ListView.builder(
-            itemCount: invoices.length,
-            itemBuilder: (context, index) {
-              final invoice = invoices[index];
-              return ListTile(
-                title: Text(invoice['name']),
-                subtitle: Text(invoice['date']),
-                trailing: IconButton(
-                  icon: const Icon(Icons.delete, color: Colors.red),
-                  onPressed: () async {
-                    invoices.removeAt(index);
-                    final updated = invoices.map((e) => jsonEncode(e)).toList();
-                    await prefs.setStringList('saved_invoices', updated);
-                    setState(() {});
-                  },
+      child: ListView(
+        children: [
+          DrawerHeader(
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.primary,
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                CircleAvatar(
+                  radius: 28,
+                  backgroundColor: Colors.white,
+                  child: Icon(
+                    Icons.account_circle,
+                    size: 48,
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
                 ),
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder:
-                          (_) => PdfPreviewPage(pdfFile: File(invoice['path'])),
-                    ),
-                  );
-                },
+                const SizedBox(height: 12),
+                Text(
+                  'Welcome!',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                Text(
+                  'Billing App',
+                  style: TextStyle(
+                    color: Colors.white.withValues(),
+                    fontSize: 14,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          ListTile(
+            leading: Icon(
+              Icons.receipt_long,
+              color: Theme.of(context).colorScheme.primary,
+            ),
+            title: const Text('Bill'),
+            onTap: () {
+              Navigator.pop(context);
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const SavedInvoicesPage()),
               );
             },
-          );
-        },
+          ),
+
+          ListTile(
+            leading: Icon(
+              Icons.contacts,
+              color: Theme.of(context).colorScheme.primary,
+            ),
+            title: const Text('Contacts'),
+            onTap: () {
+              Navigator.pop(context);
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const ContactsPage()),
+              );
+            },
+          ),
+        ],
       ),
     );
   }
