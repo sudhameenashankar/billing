@@ -1,9 +1,11 @@
 import 'dart:io';
 
+import 'package:billing/general_utility.dart';
 import 'package:flutter/material.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:file_picker/file_picker.dart';
 import '../services/contacts_service.dart';
+// import '../general_utility.dart';
 
 class ContactsPage extends StatefulWidget {
   const ContactsPage({super.key});
@@ -128,33 +130,6 @@ class _ContactsPageState extends State<ContactsPage> {
                             ),
                           ],
                         ),
-                        if ((c['shopName'] ?? '').isNotEmpty)
-                          Padding(
-                            padding: const EdgeInsets.only(
-                              top: 6.0,
-                              bottom: 2.0,
-                            ),
-                            child: Row(
-                              children: [
-                                Icon(
-                                  Icons.storefront,
-                                  size: 18,
-                                  color: Colors.deepPurple,
-                                ),
-                                const SizedBox(width: 8),
-                                Expanded(
-                                  child: Text(
-                                    c['shopName'] ?? '',
-                                    style: const TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
                         if ((c['address'] ?? '').isNotEmpty)
                           Padding(
                             padding: const EdgeInsets.only(
@@ -210,6 +185,156 @@ class _ContactsPageState extends State<ContactsPage> {
                           ),
                       ],
                     ),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.edit, color: Colors.blue),
+                    tooltip: 'Edit',
+                    onPressed: () async {
+                      final edited = await showDialog<Map<String, String>>(
+                        context: context,
+                        builder: (context) {
+                          final formKey = GlobalKey<FormState>();
+                          final nameController = TextEditingController(
+                            text: c['name'] ?? '',
+                          );
+                          final addressController = TextEditingController(
+                            text: c['address'] ?? '',
+                          );
+                          final gstinController = TextEditingController(
+                            text: c['gstin'] ?? '',
+                          );
+                          final width =
+                              MediaQuery.of(context).size.width * 0.95;
+                          return Dialog(
+                            insetPadding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 24,
+                            ),
+                            child: Container(
+                              width: width,
+                              padding: const EdgeInsets.all(16),
+                              child: SingleChildScrollView(
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    const Text(
+                                      'Edit Contact',
+                                      style: TextStyle(
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 16),
+                                    Form(
+                                      key: formKey,
+                                      child: Column(
+                                        children: [
+                                          TextFormField(
+                                            controller: nameController,
+                                            decoration: const InputDecoration(
+                                              labelText: 'Name',
+                                            ),
+                                            textCapitalization:
+                                                TextCapitalization.characters,
+                                            inputFormatters: [
+                                              UpperCaseTextFormatter(),
+                                            ],
+                                            validator:
+                                                (val) =>
+                                                    val == null ||
+                                                            val.trim().isEmpty
+                                                        ? 'Enter Name'
+                                                        : null,
+                                          ),
+                                          TextFormField(
+                                            controller: addressController,
+                                            decoration: const InputDecoration(
+                                              labelText: 'Address',
+                                            ),
+                                            textCapitalization:
+                                                TextCapitalization.characters,
+                                            inputFormatters: [
+                                              UpperCaseTextFormatter(),
+                                            ],
+                                            minLines: 3,
+                                            maxLines: 6,
+                                          ),
+                                          TextFormField(
+                                            controller: gstinController,
+                                            decoration: const InputDecoration(
+                                              labelText: 'GSTIN',
+                                            ),
+                                            textCapitalization:
+                                                TextCapitalization.characters,
+                                            inputFormatters: [
+                                              UpperCaseTextFormatter(),
+                                            ],
+                                            validator: (val) {
+                                              if (val == null ||
+                                                  val.trim().isEmpty) {
+                                                return null;
+                                              }
+                                              final gstinRegex = RegExp(
+                                                r'^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}?$',
+                                              );
+                                              if (!gstinRegex.hasMatch(
+                                                val.trim(),
+                                              )) {
+                                                return 'Enter valid GSTIN';
+                                              }
+                                              return null;
+                                            },
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    const SizedBox(height: 24),
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.end,
+                                      children: [
+                                        TextButton(
+                                          onPressed:
+                                              () => Navigator.pop(context),
+                                          child: const Text('Cancel'),
+                                        ),
+                                        const SizedBox(width: 12),
+                                        TextButton(
+                                          onPressed: () {
+                                            if (formKey.currentState!
+                                                .validate()) {
+                                              Navigator.pop(context, {
+                                                'name':
+                                                    nameController.text.trim(),
+                                                'address':
+                                                    addressController.text
+                                                        .trim(),
+                                                'gstin':
+                                                    gstinController.text.trim(),
+                                              });
+                                            }
+                                          },
+                                          child: const Text('Save'),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          );
+                        },
+                      );
+                      if (edited != null) {
+                        setState(() {
+                          _contacts[i] = edited;
+                        });
+                        await ContactsService.saveContacts(_contacts);
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Contact updated.')),
+                        );
+                      }
+                    },
                   ),
                   IconButton(
                     icon: const Icon(Icons.delete, color: Colors.red),
