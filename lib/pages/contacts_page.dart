@@ -1,7 +1,9 @@
 import 'dart:io';
 
+import 'package:billing/dialogs.dart';
 import 'package:billing/utility/general_utility.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:file_picker/file_picker.dart';
 import '../services/contacts_service.dart';
@@ -68,6 +70,7 @@ class _ContactsPageState extends State<ContactsPage> {
 
   @override
   Widget build(BuildContext context) {
+    final scaffoldMessenger = ScaffoldMessenger.of(context);
     return Scaffold(
       appBar: AppBar(
         title: const Text('Contacts'),
@@ -139,26 +142,75 @@ class _ContactsPageState extends State<ContactsPage> {
                                   minLines: 3,
                                   maxLines: 6,
                                 ),
-                                TextFormField(
-                                  controller: gstinController,
-                                  decoration: const InputDecoration(
-                                    labelText: 'GSTIN',
-                                  ),
-                                  textCapitalization:
-                                      TextCapitalization.characters,
-                                  inputFormatters: [UpperCaseTextFormatter()],
-                                  validator: (val) {
-                                    if (val == null || val.trim().isEmpty) {
-                                      return null;
-                                    }
-                                    final gstinRegex = RegExp(
-                                      r'^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}?$',
-                                    );
-                                    if (!gstinRegex.hasMatch(val.trim())) {
-                                      return 'Enter valid GSTIN';
-                                    }
-                                    return null;
-                                  },
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: TextFormField(
+                                        controller: gstinController,
+                                        decoration: const InputDecoration(
+                                          labelText: 'GSTIN',
+                                        ),
+                                        textCapitalization:
+                                            TextCapitalization.characters,
+                                        inputFormatters: [
+                                          UpperCaseTextFormatter(),
+                                        ],
+                                        validator: (val) {
+                                          if (val == null ||
+                                              val.trim().isEmpty) {
+                                            return null;
+                                          }
+                                          final gstinRegex = RegExp(
+                                            r'^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}?$',
+                                          );
+                                          if (!gstinRegex.hasMatch(
+                                            val.trim(),
+                                          )) {
+                                            return 'Enter valid GSTIN';
+                                          }
+                                          return null;
+                                        },
+                                      ),
+                                    ),
+                                    IconButton(
+                                      icon: const Icon(
+                                        Icons.qr_code_scanner,
+                                        color: Colors.deepPurple,
+                                      ),
+                                      tooltip: 'Scan GSTIN',
+                                      onPressed: () async {
+                                        final source =
+                                            await showImageSourceDialog(
+                                              context,
+                                            );
+                                        if (source != null) {
+                                          final gstin =
+                                              await scanGstinFromImage(
+                                                context,
+                                                source,
+                                              );
+                                          if (gstin != null) {
+                                            gstinController.text = gstin;
+                                            scaffoldMessenger.showSnackBar(
+                                              SnackBar(
+                                                content: Text(
+                                                  'GSTIN detected: $gstin',
+                                                ),
+                                              ),
+                                            );
+                                          } else {
+                                            scaffoldMessenger.showSnackBar(
+                                              const SnackBar(
+                                                content: Text(
+                                                  'No valid GSTIN found.',
+                                                ),
+                                              ),
+                                            );
+                                          }
+                                        }
+                                      },
+                                    ),
+                                  ],
                                 ),
                               ],
                             ),
@@ -197,13 +249,13 @@ class _ContactsPageState extends State<ContactsPage> {
               _contacts.add(added);
             });
             await ContactsService.saveContacts(_contacts);
-            ScaffoldMessenger.of(
-              context,
-            ).showSnackBar(const SnackBar(content: Text('Contact added.')));
+            scaffoldMessenger.showSnackBar(
+              const SnackBar(content: Text('Contact added.')),
+            );
           }
         },
-        child: const Icon(Icons.add),
         tooltip: 'Add Contact',
+        child: const Icon(Icons.add),
       ),
       body: ListView.builder(
         itemCount: _contacts.length,
@@ -222,9 +274,8 @@ class _ContactsPageState extends State<ContactsPage> {
                 children: [
                   CircleAvatar(
                     radius: 30,
-                    backgroundColor: Theme.of(
-                      context,
-                    ).colorScheme.primary.withOpacity(0.12),
+                    backgroundColor:
+                        Theme.of(context).colorScheme.primary.withValues(),
                     child: Icon(
                       Icons.store,
                       color: Theme.of(context).colorScheme.primary,
@@ -386,31 +437,80 @@ class _ContactsPageState extends State<ContactsPage> {
                                             minLines: 3,
                                             maxLines: 6,
                                           ),
-                                          TextFormField(
-                                            controller: gstinController,
-                                            decoration: const InputDecoration(
-                                              labelText: 'GSTIN',
-                                            ),
-                                            textCapitalization:
-                                                TextCapitalization.characters,
-                                            inputFormatters: [
-                                              UpperCaseTextFormatter(),
+                                          Row(
+                                            children: [
+                                              Expanded(
+                                                child: TextFormField(
+                                                  controller: gstinController,
+                                                  decoration:
+                                                      const InputDecoration(
+                                                        labelText: 'GSTIN',
+                                                      ),
+                                                  textCapitalization:
+                                                      TextCapitalization
+                                                          .characters,
+                                                  inputFormatters: [
+                                                    UpperCaseTextFormatter(),
+                                                  ],
+                                                  validator: (val) {
+                                                    if (val == null ||
+                                                        val.trim().isEmpty) {
+                                                      return null;
+                                                    }
+                                                    final gstinRegex = RegExp(
+                                                      r'^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}?$',
+                                                    );
+                                                    if (!gstinRegex.hasMatch(
+                                                      val.trim(),
+                                                    )) {
+                                                      return 'Enter valid GSTIN';
+                                                    }
+                                                    return null;
+                                                  },
+                                                ),
+                                              ),
+                                              IconButton(
+                                                icon: const Icon(
+                                                  Icons.qr_code_scanner,
+                                                  color: Colors.deepPurple,
+                                                ),
+                                                tooltip: 'Scan GSTIN',
+                                                onPressed: () async {
+                                                  final source =
+                                                      await showImageSourceDialog(
+                                                        context,
+                                                      );
+                                                  if (source != null) {
+                                                    final gstin =
+                                                        await scanGstinFromImage(
+                                                          context,
+                                                          source,
+                                                        );
+                                                    if (gstin != null) {
+                                                      gstinController.text =
+                                                          gstin;
+                                                      scaffoldMessenger
+                                                          .showSnackBar(
+                                                            SnackBar(
+                                                              content: Text(
+                                                                'GSTIN detected: $gstin',
+                                                              ),
+                                                            ),
+                                                          );
+                                                    } else {
+                                                      scaffoldMessenger
+                                                          .showSnackBar(
+                                                            const SnackBar(
+                                                              content: Text(
+                                                                'No valid GSTIN found.',
+                                                              ),
+                                                            ),
+                                                          );
+                                                    }
+                                                  }
+                                                },
+                                              ),
                                             ],
-                                            validator: (val) {
-                                              if (val == null ||
-                                                  val.trim().isEmpty) {
-                                                return null;
-                                              }
-                                              final gstinRegex = RegExp(
-                                                r'^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}?$',
-                                              );
-                                              if (!gstinRegex.hasMatch(
-                                                val.trim(),
-                                              )) {
-                                                return 'Enter valid GSTIN';
-                                              }
-                                              return null;
-                                            },
                                           ),
                                         ],
                                       ),
@@ -456,7 +556,7 @@ class _ContactsPageState extends State<ContactsPage> {
                           _contacts[i] = edited;
                         });
                         await ContactsService.saveContacts(_contacts);
-                        ScaffoldMessenger.of(context).showSnackBar(
+                        scaffoldMessenger.showSnackBar(
                           const SnackBar(content: Text('Contact updated.')),
                         );
                       }
@@ -495,7 +595,7 @@ class _ContactsPageState extends State<ContactsPage> {
                           _contacts.removeAt(i);
                         });
                         await ContactsService.saveContacts(_contacts);
-                        ScaffoldMessenger.of(context).showSnackBar(
+                        scaffoldMessenger.showSnackBar(
                           const SnackBar(content: Text('Contact deleted.')),
                         );
                       }
