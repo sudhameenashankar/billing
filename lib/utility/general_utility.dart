@@ -49,15 +49,16 @@ Future<String?> scanGstinFromImage(
     inputImage,
   );
 
-  // GSTIN regex
+  // GSTIN regex (no word boundaries, allows GSTIN to be embedded in other text)
   final gstinRegex = RegExp(
-    r'\b[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}\b',
+    r'[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}',
   );
   String? foundGstin;
 
   for (final block in recognizedText.blocks) {
     for (final line in block.lines) {
-      final match = gstinRegex.firstMatch(line.text.replaceAll(' ', ''));
+      final cleaned = line.text.replaceAll(' ', '');
+      final match = gstinRegex.firstMatch(cleaned);
       if (match != null) {
         foundGstin = match.group(0);
         break;
