@@ -81,47 +81,174 @@ class _ContactsPageState extends State<ContactsPage> {
         itemCount: _contacts.length,
         itemBuilder: (context, i) {
           final c = _contacts[i];
-          return ListTile(
-            title: Text(c['name'] ?? ''),
-            subtitle: Text('${c['gstin'] ?? ''}\n${c['address'] ?? ''}'),
-            isThreeLine: true,
-            trailing: IconButton(
-              icon: const Icon(Icons.delete, color: Colors.red),
-              tooltip: 'Delete',
-              onPressed: () async {
-                final confirm = await showDialog<bool>(
-                  context: context,
-                  builder:
-                      (context) => AlertDialog(
-                        title: const Text('Delete Contact'),
-                        content: Text(
-                          'Are you sure you want to delete this contact?',
+          return Card(
+            margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            elevation: 4,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(14),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  CircleAvatar(
+                    radius: 24,
+                    backgroundColor: Theme.of(
+                      context,
+                    ).colorScheme.primary.withOpacity(0.1),
+                    child: Icon(
+                      Icons.store,
+                      color: Theme.of(context).colorScheme.primary,
+                      size: 28,
+                    ),
+                  ),
+                  const SizedBox(width: 14),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Icon(
+                              Icons.person,
+                              size: 18,
+                              color: Theme.of(context).colorScheme.primary,
+                            ),
+                            const SizedBox(width: 6),
+                            Text(
+                              c['name'] ?? '',
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16,
+                              ),
+                            ),
+                          ],
                         ),
-                        actions: [
-                          TextButton(
-                            onPressed: () => Navigator.pop(context, false),
-                            child: const Text('Cancel'),
-                          ),
-                          TextButton(
-                            onPressed: () => Navigator.pop(context, true),
-                            child: const Text(
-                              'Delete',
-                              style: TextStyle(color: Colors.red),
+                        if ((c['shopName'] ?? '').isNotEmpty)
+                          Padding(
+                            padding: const EdgeInsets.only(
+                              top: 4.0,
+                              bottom: 2.0,
+                            ),
+                            child: Row(
+                              children: [
+                                Icon(
+                                  Icons.storefront,
+                                  size: 16,
+                                  color: Colors.deepPurple,
+                                ),
+                                const SizedBox(width: 6),
+                                Flexible(
+                                  child: Text(
+                                    c['shopName'] ?? '',
+                                    style: const TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
-                        ],
-                      ),
-                );
-                if (confirm == true) {
-                  setState(() {
-                    _contacts.removeAt(i);
-                  });
-                  await ContactsService.saveContacts(_contacts);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Contact deleted.')),
-                  );
-                }
-              },
+                        if ((c['address'] ?? '').isNotEmpty)
+                          Padding(
+                            padding: const EdgeInsets.only(
+                              top: 2.0,
+                              bottom: 2.0,
+                            ),
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Icon(
+                                  Icons.location_on,
+                                  size: 16,
+                                  color: Colors.teal,
+                                ),
+                                const SizedBox(width: 6),
+                                Flexible(
+                                  child: Text(
+                                    c['address'] ?? '',
+                                    style: const TextStyle(fontSize: 14),
+                                    overflow: TextOverflow.ellipsis,
+                                    maxLines: 2,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        if ((c['gstin'] ?? '').isNotEmpty)
+                          Padding(
+                            padding: const EdgeInsets.only(
+                              top: 2.0,
+                              bottom: 2.0,
+                            ),
+                            child: Row(
+                              children: [
+                                Icon(
+                                  Icons.confirmation_number,
+                                  size: 16,
+                                  color: Colors.orange,
+                                ),
+                                const SizedBox(width: 6),
+                                Flexible(
+                                  child: Text(
+                                    c['gstin'] ?? '',
+                                    style: const TextStyle(
+                                      fontSize: 14,
+                                      color: Colors.grey,
+                                    ),
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.delete, color: Colors.red),
+                    tooltip: 'Delete',
+                    onPressed: () async {
+                      final confirm = await showDialog<bool>(
+                        context: context,
+                        builder:
+                            (context) => AlertDialog(
+                              title: const Text('Delete Contact'),
+                              content: Text(
+                                'Are you sure you want to delete this contact?',
+                              ),
+                              actions: [
+                                TextButton(
+                                  onPressed:
+                                      () => Navigator.pop(context, false),
+                                  child: const Text('Cancel'),
+                                ),
+                                TextButton(
+                                  onPressed: () => Navigator.pop(context, true),
+                                  child: const Text(
+                                    'Delete',
+                                    style: TextStyle(color: Colors.red),
+                                  ),
+                                ),
+                              ],
+                            ),
+                      );
+                      if (confirm == true) {
+                        setState(() {
+                          _contacts.removeAt(i);
+                        });
+                        await ContactsService.saveContacts(_contacts);
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Contact deleted.')),
+                        );
+                      }
+                    },
+                  ),
+                ],
+              ),
             ),
           );
         },
