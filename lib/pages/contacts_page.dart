@@ -85,6 +85,44 @@ class _ContactsPageState extends State<ContactsPage> {
             title: Text(c['name'] ?? ''),
             subtitle: Text('${c['gstin'] ?? ''}\n${c['address'] ?? ''}'),
             isThreeLine: true,
+            trailing: IconButton(
+              icon: const Icon(Icons.delete, color: Colors.red),
+              tooltip: 'Delete',
+              onPressed: () async {
+                final confirm = await showDialog<bool>(
+                  context: context,
+                  builder:
+                      (context) => AlertDialog(
+                        title: const Text('Delete Contact'),
+                        content: Text(
+                          'Are you sure you want to delete this contact?',
+                        ),
+                        actions: [
+                          TextButton(
+                            onPressed: () => Navigator.pop(context, false),
+                            child: const Text('Cancel'),
+                          ),
+                          TextButton(
+                            onPressed: () => Navigator.pop(context, true),
+                            child: const Text(
+                              'Delete',
+                              style: TextStyle(color: Colors.red),
+                            ),
+                          ),
+                        ],
+                      ),
+                );
+                if (confirm == true) {
+                  setState(() {
+                    _contacts.removeAt(i);
+                  });
+                  await ContactsService.saveContacts(_contacts);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Contact deleted.')),
+                  );
+                }
+              },
+            ),
           );
         },
       ),
