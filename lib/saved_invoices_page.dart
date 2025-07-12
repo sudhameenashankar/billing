@@ -34,10 +34,14 @@ class _SavedInvoicesPageState extends State<SavedInvoicesPage> {
           final List<String> savedInvoices =
               prefs.getStringList('saved_invoices') ?? [];
           final invoices =
-              savedInvoices.map((e) {
-                final map = jsonDecode(e) as Map<String, dynamic>;
-                return map;
-              }).toList();
+              savedInvoices
+                  .map((e) {
+                    final map = jsonDecode(e) as Map<String, dynamic>;
+                    return map;
+                  })
+                  .toList()
+                  .reversed
+                  .toList();
           if (invoices.isEmpty) {
             return Center(
               child: Text(
