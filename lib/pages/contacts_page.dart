@@ -79,6 +79,132 @@ class _ContactsPageState extends State<ContactsPage> {
           IconButton(icon: const Icon(Icons.share), onPressed: _shareContacts),
         ],
       ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () async {
+          final formKey = GlobalKey<FormState>();
+          final nameController = TextEditingController();
+          final addressController = TextEditingController();
+          final gstinController = TextEditingController();
+          final width = MediaQuery.of(context).size.width * 0.95;
+          final added = await showDialog<Map<String, String>>(
+            context: context,
+            builder:
+                (context) => Dialog(
+                  insetPadding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 24,
+                  ),
+                  child: Container(
+                    width: width,
+                    padding: const EdgeInsets.all(16),
+                    child: SingleChildScrollView(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            'Add Contact',
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          Form(
+                            key: formKey,
+                            child: Column(
+                              children: [
+                                TextFormField(
+                                  controller: nameController,
+                                  decoration: const InputDecoration(
+                                    labelText: 'Name',
+                                  ),
+                                  textCapitalization:
+                                      TextCapitalization.characters,
+                                  inputFormatters: [UpperCaseTextFormatter()],
+                                  validator:
+                                      (val) =>
+                                          val == null || val.trim().isEmpty
+                                              ? 'Enter Name'
+                                              : null,
+                                ),
+                                TextFormField(
+                                  controller: addressController,
+                                  decoration: const InputDecoration(
+                                    labelText: 'Address',
+                                  ),
+                                  textCapitalization:
+                                      TextCapitalization.characters,
+                                  inputFormatters: [UpperCaseTextFormatter()],
+                                  minLines: 3,
+                                  maxLines: 6,
+                                ),
+                                TextFormField(
+                                  controller: gstinController,
+                                  decoration: const InputDecoration(
+                                    labelText: 'GSTIN',
+                                  ),
+                                  textCapitalization:
+                                      TextCapitalization.characters,
+                                  inputFormatters: [UpperCaseTextFormatter()],
+                                  validator: (val) {
+                                    if (val == null || val.trim().isEmpty) {
+                                      return null;
+                                    }
+                                    final gstinRegex = RegExp(
+                                      r'^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}?$',
+                                    );
+                                    if (!gstinRegex.hasMatch(val.trim())) {
+                                      return 'Enter valid GSTIN';
+                                    }
+                                    return null;
+                                  },
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: 24),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              TextButton(
+                                onPressed: () => Navigator.pop(context),
+                                child: const Text('Cancel'),
+                              ),
+                              const SizedBox(width: 12),
+                              TextButton(
+                                onPressed: () {
+                                  if (formKey.currentState!.validate()) {
+                                    Navigator.pop(context, {
+                                      'name': nameController.text.trim(),
+                                      'address': addressController.text.trim(),
+                                      'gstin': gstinController.text.trim(),
+                                    });
+                                  }
+                                },
+                                child: const Text('Save'),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+          );
+          if (added != null) {
+            setState(() {
+              _contacts.add(added);
+            });
+            await ContactsService.saveContacts(_contacts);
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(const SnackBar(content: Text('Contact added.')));
+          }
+        },
+        child: const Icon(Icons.add),
+        tooltip: 'Add Contact',
+      ),
       body: ListView.builder(
         itemCount: _contacts.length,
         itemBuilder: (context, i) {
